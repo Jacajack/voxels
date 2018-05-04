@@ -4,22 +4,36 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-//Shader files
-const char *vertex_shader_file = "shaders/vertex.glsl";
-const char *fragment_shader_file = "shaders/fragment.glsl";
+//TEMP
+#include "voxel.hpp"
 
 //State variables
-bool renderer_active = true;
-bool renderer_error = false;
+bool renderer::active = true;
+bool renderer::error = false;
+
+//Window properties
+int renderer::window_width = 1024;
+int renderer::window_height = 768;
+
+//Shader files
+std::string renderer::vertex_shader_file = "shaders/vertex.glsl";
+std::string renderer::fragment_shader_file = "shaders/fragment.glsl";
+
+//Camera matrix
+glm::mat4 renderer::view_matrix;
+
+//Projection matrix
+glm::mat4 renderer::projection_matrix;
 
 //Shader loader
-static int load_shaders(GLuint *program_id, const char *vertex_shader_file, const char *fragment_shader_file)
+static int load_shaders(GLuint *program_id, std::string vertex_shader_file, std::string fragment_shader_file)
 {
 	GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
@@ -121,38 +135,46 @@ static int load_shaders(GLuint *program_id, const char *vertex_shader_file, cons
 }
 
 //Render loop
-static void renderer_loop(GLFWwindow *window)
+static void renderer_loop(GLFWwindow *window, GLuint program_id)
 {
+	//TEMP
+	Voxel vox( 0, 0, 0 );
+
 	//Render loop
-    while (renderer_active 
-        && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS 
-        && glfwWindowShouldClose(window) == 0)
-    {
-        //Clear GL buffers
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	while (renderer::active 
+		&& glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS 
+		&& glfwWindowShouldClose(window) == 0)
+	{
+		//Clear GL buffers
+		glClearColor( 0.1, 0.1, 0.1, 0.0 );
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//Use shaders
+		glUseProgram(program_id);
 
+		//Render whole map
+		vox.draw( );
 
 		//Swap buffers
 		glfwSwapBuffers(window);
 
 		//Poll events
 		glfwPollEvents();
-    }
+	}
 }
 
 //Renderer init
-void *renderer_init(void *data)
+void *renderer::renderer_init(void *data)
 {
-    GLFWwindow *window;
+	GLFWwindow *window;
 
-    //GLFW init
+	//GLFW init
 	if (!glfwInit())
 	{
 		std::cerr << "GLFW init failed\n";
-		renderer_error = true;
-        renderer_active = false;
-        return NULL;
+		renderer::error = true;
+		renderer::active = false;
+		return NULL;
 	}
 
 	//Window params
@@ -162,15 +184,15 @@ void *renderer_init(void *data)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    //Window creation
-	window = glfwCreateWindow(1024, 768, "Crapgame", NULL, NULL);
+	//Window creation
+	window = glfwCreateWindow(renderer::window_width, renderer::window_height, "Crapgame", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Cannot create window\n";
 		glfwTerminate();
-		renderer_error = true;
-        renderer_active = false;
-        return NULL;
+		renderer::error = true;
+		renderer::active = false;
+		return NULL;
 	}
 
 	//GLEW init
@@ -179,27 +201,54 @@ void *renderer_init(void *data)
 	if (glewInit() != GLEW_OK)
 	{
 		std::cout << "GLEW init failed\n";
-        glfwTerminate();
-		renderer_error = true;
-        renderer_active = false;
-        return NULL;
+		glfwTerminate();
+		renderer::error = true;
+		renderer::active = false;
+		return NULL;
 	}
 
 	//Load shaders
 	GLuint program_id;
-	if (load_shaders(&program_id, vertex_shader_file, fragment_shader_file))
+	if (load_shaders(&program_id, renderer::vertex_shader_file, renderer::fragment_shader_file))
 	{
 		glfwTerminate();
-		renderer_error = true;
-        renderer_active = false;
-        return NULL;
+		renderer::error = true;
+		renderer::active = false;
+		return NULL;
 	}
 
-    //Input mode
+	//Default view matrix
+	renderer::view_matrix = glm::lookAt(
+			glm::vec3(0, 0, 10), //Eye
+			glm::vec3(0, 0, 0),  //Center
+			glm::vec3(0, 0, 1)   //Head orientation
+		);
+
+	//Default projection matrix
+	renderer::projection_matrix = glm::perspective(
+			glm::radians( 45.0 ), //FoV
+			(double) renderer::window_width / renderer::window_height, //Aspect ratio
+			0.1, //Near clipping plane
+			100.0 //Far clipping plane
+		);
+
+	//Enable Z-buffer
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	
+	//Create vertex array
+	GLuint vertex_array_id;
+	glGenVertexArrays(1, &vertex_array_id);
+	glBindVertexArray(vertex_array_id);
+
+	//Input mode
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 	
 	//Start rendering
-	renderer_loop(window);   
+	renderer_loop(window, program_id);   
 
-    return NULL;
+	//Cleanup
+	//TODO
+
+	return NULL;
 }

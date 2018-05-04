@@ -18,7 +18,7 @@ int main( int argc, char **argv )
 {
     //Start renderer thread
     pthread_t renderer_thread;
-    pthread_create( &renderer_thread, NULL, renderer_init, NULL );
+    pthread_create( &renderer_thread, NULL, renderer::renderer_init, NULL );
 
 	//Wait for renderer to finish
     pthread_join( renderer_thread, NULL );
