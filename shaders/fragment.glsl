@@ -9,5 +9,9 @@ out vec3 foColor;
 void main()
 {
 	//Just apply the color from vertex shader
-    foColor = fiColor;
+    //foColor = fiColor;
+
+	//White
+	foColor = vec3(1, 1, 0);
+
 }
