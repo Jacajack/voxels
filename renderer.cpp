@@ -140,7 +140,10 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 	glm::mat4 camera_matrix;
 
 	//TEMP
-	Voxel vox( 0, 0, 0 );
+	Voxel voxa( 0, 0, 0 );
+	Voxel voxb( 0, 0, 1 );
+	Voxel voxc( 0, 1, 0 );
+	Voxel voxd( 1, 0, 0 );
 
 	//Render loop
 	while (renderer::active 
@@ -158,7 +161,10 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 		camera_matrix = renderer::projection_matrix * renderer::view_matrix;
 
 		//Render whole map
-		vox.draw(program_id, camera_matrix);
+		voxa.draw(program_id, camera_matrix);
+		voxb.draw(program_id, camera_matrix);
+		voxc.draw(program_id, camera_matrix);
+		voxd.draw(program_id, camera_matrix);
 
 		//Swap buffers
 		glfwSwapBuffers(window);
