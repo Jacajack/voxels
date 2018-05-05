@@ -146,11 +146,14 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 	Voxel voxb( 0, 0, 1 );
 	Voxel voxc( 0, 1, 0 );
 	Voxel voxd( 1, 0, 0 );
-	Model monkey("monkey.obj");
+	Model monkey("models/untitled.obj", "models/eye.png");
 
 	//Get GLSL handles
 	GLuint model_matrix_id = glGetUniformLocation(program_id, "model");
 	GLuint camera_matrix_id = glGetUniformLocation(program_id, "camera");
+	GLuint texture_uniform_id = glGetUniformLocation(program_id, "texture_sampler");
+
+	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	//Render loop
 	while (renderer::active 
@@ -179,7 +182,7 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 		//Swap buffers
 		glm::mat4 aa(1.0);
 		glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, &aa[0][0]);
-		monkey.draw();
+		monkey.draw(texture_uniform_id);
 
 		glfwSwapBuffers(window);
 

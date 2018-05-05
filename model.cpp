@@ -1,14 +1,15 @@
 #include "model.hpp"
 
 #include <string>
+#include <cstdio>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <regex>
 
+#include <libpng16/png.h>
 #include <GL/glew.h>
 
-//Just an allocation constructor
 int Model::load_obj(std::string filename, bool verbose)
 {
 	std::ifstream objfile(filename, std::ios::in);
@@ -63,7 +64,7 @@ int Model::load_obj(std::string filename, bool verbose)
 			else if (token_type == "vn") //Normal
 			{
 				glm::vec3 norm;
-				std::sscanf(token_data.c_str(), "%f %f %f", &norm.x, &norm.y, &norm.y);
+				std::sscanf(token_data.c_str(), "%f %f %f", &norm.x, &norm.y, &norm.z);
 				normals.push_back(norm);
 			}
 			else if (token_type == "f") //Faces
@@ -195,16 +196,119 @@ int Model::load_obj(std::string filename, bool verbose)
 	return 0;
 }
 
+int Model::load_texture(std::string filename, bool verbose)
+{
+	//Open texture file
+	std::FILE *texfile;
+	texfile = std::fopen(filename.c_str(), "rb");
+	if (texfile == NULL)
+	{
+		std::cerr << "cannot load texture file - " << filename << "\n";
+		return 1;
+	}
+
+	//Libpng init
+	png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (png == NULL)
+	{
+		std::cerr << "libpng init failed\n";
+		return 1;
+	}
+
+	//Get PNG info
+	png_infop pnginfo = png_create_info_struct(png);
+	if (pnginfo == NULL)
+	{
+		std::cerr << "cannot get png info\n";
+		return 1;
+	}
+
+	//Setjmp should be here here
+
+	//Read info
+	png_init_io(png, texfile);
+	png_read_info(png, pnginfo);
+	this->texture_width = png_get_image_width(png, pnginfo);
+	this->texture_height = png_get_image_height(png, pnginfo);
+	png_byte color_type = png_get_color_type(png, pnginfo);
+	png_byte bit_depth = png_get_bit_depth(png, pnginfo);
+
+	//Read colors into 8-bit RGBA space
+	if (bit_depth == 16) png_set_strip_16(png);
+	if (color_type == PNG_COLOR_TYPE_PALETTE) png_set_palette_to_rgb(png);
+	if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) png_set_expand_gray_1_2_4_to_8(png);
+	if (png_get_valid(png, pnginfo, PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png);
+	//if (color_type == PNG_COLOR_TYPE_RGB
+	//	|| color_type == PNG_COLOR_TYPE_GRAY
+	//	|| color_type == PNG_COLOR_TYPE_PALETTE )
+	//		png_set_filter(png, 0xff, PNG_FILLER_AFTER);
+	if (color_type == PNG_COLOR_TYPE_GRAY
+		|| color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+    		png_set_gray_to_rgb(png);
+
+	png_read_update_info(png, pnginfo);
+
+
+	//Create raw texture buffer
+	this->texture = new unsigned char[this->texture_width * this->texture_height * 3];
+
+	png_bytep *rows = new png_bytep[this->texture_height];
+	//for (int i = 0; i < this->texture_height; i++)
+	//	rows[i] = new png_byte[png_get_rowbytes(png, pnginfo)];
+	
+	unsigned char *p = this->texture;
+	for (int i = this->texture_height - 1; i >= 0; i--)
+	{
+		rows[i] = p;
+		p += this->texture_width * 3;
+	}
+
+	png_read_image(png, rows);
+
+	
+	//for (int i = 0; i < this->texture_width * this->texture_height * 3; i++ )
+	//	this->texture[i] = 255 * ( i % 1000000 > 500000 );
+	
+
+	//for (int i = 0; i < this->texture_height; i++)
+	//	delete rows[i];
+	delete rows;
+
+
+	std::fclose(texfile);
+}
+
 void Model::init_buffers()
 {
 	if (this->buffers_loaded) return;
 
-	//Create GL buffer
+	//Create vertex buffer
 	glGenBuffers(1, &this->vertex_buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer_id);
 
 	//Load vertex buffer with data
 	glBufferData(GL_ARRAY_BUFFER, sizeof(this->vertices[0]) * this->vertices.size(), &this->vertices[0], GL_STATIC_DRAW);
+
+	//Create UV buffer
+	glGenBuffers(1, &this->uv_buffer_id);
+	glBindBuffer(GL_ARRAY_BUFFER, this->uv_buffer_id);
+
+	//Load UV buffer with data
+	glBufferData(GL_ARRAY_BUFFER, sizeof(this->uvs[0]) * this->uvs.size(), &this->uvs[0], GL_STATIC_DRAW);
+
+	//Create texture
+	glGenTextures(1, &this->texture_id);
+	glBindTexture(GL_TEXTURE_2D, this->texture_id);
+
+	//Pass texture data to OpenGL
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->texture_width, this->texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, this->texture );
+
+	//Texture settings
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	this->buffers_loaded = true;
 }
@@ -219,11 +323,16 @@ void Model::free_buffers()
 }
 
 //Just draw the model
-void Model::draw()
+void Model::draw(GLuint texture_uniform_id)
 {
 	if (!this->buffers_loaded) return;
 	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->texture_id);
+	glUniform1i(texture_uniform_id, 0);
+
 	glEnableVertexAttribArray(0); //Vertex data
+	glEnableVertexAttribArray(1); //UV
 
 	//Attribute 0 - vertex position
 	glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer_id);
@@ -236,17 +345,37 @@ void Model::draw()
 		NULL //Array buffer offset
 	);
 
+	//Attribute 1 - UV
+	glBindBuffer(GL_ARRAY_BUFFER, this->uv_buffer_id);
+	glVertexAttribPointer(
+		1, //Attribute ID
+		2, //Size
+		GL_FLOAT, //Type
+		GL_FALSE, //Normalized
+		0, //Stride
+		NULL //Array buffer offset
+	);
+
 	glDrawArrays(GL_TRIANGLES, 0, this->vertices.size());
 
 	glDisableVertexAttribArray(0); //Vertex data
+	glDisableVertexAttribArray(1); //UV
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 //Loader constructor
-Model::Model(std::string filename)
+Model::Model(std::string obj_filename, std::string texture_filename)
 {
-	if ( !this->load_obj(filename, true) )
+	this->buffers_loaded = false;
+
+
+	if ( !this->load_obj(obj_filename, true) )
 	{
-		this->init_buffers();
+		if ( !this->load_texture( texture_filename, true ) )
+		{
+			this->init_buffers();
+		}
 	}
 }
 
@@ -254,4 +383,5 @@ Model::Model(std::string filename)
 Model::~Model()
 {
 	this->free_buffers();
+	delete this->texture;
 }

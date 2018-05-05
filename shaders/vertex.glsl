@@ -1,13 +1,13 @@
 #version 330 core
 layout(location = 0) in vec3 vPosition; //Vertex position (modelspace)
-layout(location = 1) in vec3 vColor;    //Vertex color
+layout(location = 1) in vec2 vUV;       //Vertex UV
 
 //Model, view and projection matrices
 uniform mat4 model;
 uniform mat4 camera;
 
 //Fragment color output
-out vec3 fColor;
+out vec2 UV;
 
 void main( )
 {
@@ -15,5 +15,6 @@ void main( )
     gl_Position = camera * model * vec4(vPosition, 1);
 
 	//Just pass on the color to the fragment shader
-	fColor = vColor;
+	//fColor = vColor;
+	UV = vUV;
 }
