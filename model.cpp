@@ -198,6 +198,8 @@ int Model::load_obj(std::string filename, bool verbose)
 
 int Model::load_texture(std::string filename, bool verbose)
 {
+	if (verbose) std::cerr << "Loading texture file - " << filename << "\n";
+
 	//Open texture file
 	std::FILE *texfile;
 	texfile = std::fopen(filename.c_str(), "rb");
@@ -272,6 +274,8 @@ int Model::load_texture(std::string filename, bool verbose)
 	png_destroy_info_struct(png, &pnginfo);
 	png_destroy_read_struct(&png, &pnginfo, NULL);	
 	std::fclose(texfile);
+
+	if (verbose) std::cerr << "Done texture file (" << this->texture_width << "x" << this->texture_height << ")\n";
 
 	return 0;
 }
