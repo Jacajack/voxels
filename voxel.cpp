@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
+
 //Cube vertices
 static const GLfloat voxel_vertices[] = 
 {
@@ -114,15 +115,13 @@ static const GLfloat voxel_colors[] =
 
 //Renders the voxel on the screen
 //This is very likely to be the worst render routine ever
-void Voxel::draw(GLuint program_id, glm::mat4 camera_matrix)
+void Voxel::draw(GLuint model_matrix_id)
 {
 	//The model matrix
 	glm::mat4 model_matrix = glm::translate(glm::vec3(this->x, this->y, this->z)) * glm::scale(glm::vec3(this->scale));
-	glm::mat4 mvp_matrix = camera_matrix * model_matrix;
 
 	//Apply view and projection matrices
-	GLuint model_matrix_id = glGetUniformLocation(program_id, "MVP");
-	glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, &mvp_matrix[0][0]);
+	glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, &model_matrix[0][0]);
 
 	//Create vertex buffer (I honestly have no idea if it's meant to be created each time....)
 	GLuint vertex_buffer;

@@ -13,6 +13,7 @@
 
 //TEMP
 #include "voxel.hpp"
+#include "model.hpp"
 
 //State variables
 bool renderer::active = true;
@@ -138,12 +139,18 @@ static int load_shaders(GLuint *program_id, std::string vertex_shader_file, std:
 static void renderer_loop(GLFWwindow *window, GLuint program_id)
 {
 	glm::mat4 camera_matrix;
+	glm::mat4 model_matrix;
 
 	//TEMP
 	Voxel voxa( 0, 0, 0 );
 	Voxel voxb( 0, 0, 1 );
 	Voxel voxc( 0, 1, 0 );
 	Voxel voxd( 1, 0, 0 );
+	Model monkey("monkey.obj");
+
+	//Get GLSL handles
+	GLuint model_matrix_id = glGetUniformLocation(program_id, "model");
+	GLuint camera_matrix_id = glGetUniformLocation(program_id, "camera");
 
 	//Render loop
 	while (renderer::active 
@@ -159,14 +166,21 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 
 		//Apply view and projection matrices
 		camera_matrix = renderer::projection_matrix * renderer::view_matrix;
+		glUniformMatrix4fv(camera_matrix_id, 1, GL_FALSE, &camera_matrix[0][0]);
+
 
 		//Render whole map
-		voxa.draw(program_id, camera_matrix);
-		voxb.draw(program_id, camera_matrix);
-		voxc.draw(program_id, camera_matrix);
-		voxd.draw(program_id, camera_matrix);
+		//voxa.draw(program_id, camera_matrix);
+		//voxb.draw(model_matrix_id);
+		//voxc.draw(program_id, camera_matrix);
+		//voxd.draw(model_matrix_id);
+		
 
 		//Swap buffers
+		glm::mat4 aa(1.0);
+		glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, &aa[0][0]);
+		monkey.draw();
+
 		glfwSwapBuffers(window);
 
 		//Poll events

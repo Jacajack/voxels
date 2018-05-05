@@ -17,7 +17,7 @@ class Voxel
 	public:
 
 		//Render function
-		void draw(GLuint program_id, glm::mat4 camera_matrix);
+		void draw(GLuint model_matrix_id);
 		Voxel( float x, float y, float z );
 };
 
