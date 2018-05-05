@@ -37,7 +37,7 @@ int main( int argc, char **argv )
         angle += dt * 3.14;
 
 	    renderer::view_matrix = glm::lookAt(
-			glm::vec3(4 * sin(angle), 4 * cos(angle), 3 * sin(angle / 4)), //Eye
+			glm::vec3(6 * sin(angle), 6 * cos(angle), 3 * sin(angle / 4)), //Eye
 			glm::vec3(0, 0, 0), //Center
 			glm::vec3(0, 0, 1)  //Head orientation
 		);

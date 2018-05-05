@@ -196,7 +196,7 @@ void *renderer::renderer_init(void *data)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	//Window creation
-	window = glfwCreateWindow(renderer::window_width, renderer::window_height, "Crapgame", NULL, NULL);
+	window = glfwCreateWindow(renderer::window_width, renderer::window_height, "Not only voxels, but it's already called 'voxels'...", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Cannot create window\n";
