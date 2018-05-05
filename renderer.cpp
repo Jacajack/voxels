@@ -146,7 +146,7 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 	Voxel voxb( 0, 0, 1 );
 	Voxel voxc( 0, 1, 0 );
 	Voxel voxd( 1, 0, 0 );
-	Model monkey("models/untitled.obj", "models/eye.png");
+	Model monkey("models/face.obj", "models/face.png");
 
 	//Get GLSL handles
 	GLuint model_matrix_id = glGetUniformLocation(program_id, "model");

@@ -10,6 +10,8 @@
 #include <libpng16/png.h>
 #include <GL/glew.h>
 
+//This is awfully slow because... guess what...
+//It uses regex!
 int Model::load_obj(std::string filename, bool verbose)
 {
 	std::ifstream objfile(filename, std::ios::in);
@@ -128,8 +130,8 @@ int Model::load_obj(std::string filename, bool verbose)
 				}
 
 				vids.push_back(vid[0]);
-				vids.push_back(vid[2]);
 				vids.push_back(vid[1]);
+				vids.push_back(vid[2]);
 				uvids.push_back(uvid[0]);
 				uvids.push_back(uvid[1]);
 				uvids.push_back(uvid[2]);
@@ -156,13 +158,11 @@ int Model::load_obj(std::string filename, bool verbose)
 	//'Unpack' the data
 	if (verbose) std::cerr << "Unpacking the data\n";
 	int missing_vertices = 0, missing_uvs = 0, missing_normals = 0;
-	for (int i = 0; i < vids.size(); i++)
+	for (unsigned int i = 0; i < vids.size(); i++)
 	{
-		int vid = vids[i] - 1;
-		int uvid = uvids[i] - 1;
-		int nid = nids[i] - 1;
-
-		//std::cout << vid << " " << uvid << " " << nid << "\n";
+		unsigned int vid = vids[i] - 1;
+		unsigned int uvid = uvids[i] - 1;
+		unsigned int nid = nids[i] - 1;
 
 		if (vid >= vertices.size())
 		{
@@ -190,7 +190,7 @@ int Model::load_obj(std::string filename, bool verbose)
 	if (verbose) std::cerr << "\tmissing vertices: " << missing_vertices << "\n";
 	if (verbose) std::cerr << "\tmissing uvs: " << missing_uvs << "\n";
 	if (verbose) std::cerr << "\tmissing normals: " << missing_normals << "\n";
-	if (verbose) std::cerr << "\t faces: " << face_count << "\n";
+	if (verbose) std::cerr << "\tfaces: " << face_count << "\n";
 	
 	if (verbose) std::cerr << "Done loading model\n";
 	return 0;
@@ -223,7 +223,13 @@ int Model::load_texture(std::string filename, bool verbose)
 		return 1;
 	}
 
-	//Setjmp should be here here
+	//Libpng error handler
+	if (setjmp(png_jmpbuf(png)))
+	{
+		png_destroy_read_struct(&png, &pnginfo, NULL);
+		std::cerr << "libpng error\n";
+		return 1;
+	}
 
 	//Read info
 	png_init_io(png, texfile);
@@ -233,29 +239,23 @@ int Model::load_texture(std::string filename, bool verbose)
 	png_byte color_type = png_get_color_type(png, pnginfo);
 	png_byte bit_depth = png_get_bit_depth(png, pnginfo);
 
-	//Read colors into 8-bit RGBA space
+	//Force 8-bit RGB space
 	if (bit_depth == 16) png_set_strip_16(png);
 	if (color_type == PNG_COLOR_TYPE_PALETTE) png_set_palette_to_rgb(png);
 	if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) png_set_expand_gray_1_2_4_to_8(png);
 	if (png_get_valid(png, pnginfo, PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png);
-	//if (color_type == PNG_COLOR_TYPE_RGB
-	//	|| color_type == PNG_COLOR_TYPE_GRAY
-	//	|| color_type == PNG_COLOR_TYPE_PALETTE )
-	//		png_set_filter(png, 0xff, PNG_FILLER_AFTER);
 	if (color_type == PNG_COLOR_TYPE_GRAY
 		|| color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
     		png_set_gray_to_rgb(png);
-
+	png_set_interlace_handling(png);
 	png_read_update_info(png, pnginfo);
 
-
-	//Create raw texture buffer
+	//This is linear texture buffer
 	this->texture = new unsigned char[this->texture_width * this->texture_height * 3];
 
+	//And this tricks libpng to read data into my linear bufer buahaha
+	//Note: BMPs are upside down while PNGs are not
 	png_bytep *rows = new png_bytep[this->texture_height];
-	//for (int i = 0; i < this->texture_height; i++)
-	//	rows[i] = new png_byte[png_get_rowbytes(png, pnginfo)];
-	
 	unsigned char *p = this->texture;
 	for (int i = this->texture_height - 1; i >= 0; i--)
 	{
@@ -263,19 +263,17 @@ int Model::load_texture(std::string filename, bool verbose)
 		p += this->texture_width * 3;
 	}
 
+	//Read data
 	png_read_image(png, rows);
 
-	
-	//for (int i = 0; i < this->texture_width * this->texture_height * 3; i++ )
-	//	this->texture[i] = 255 * ( i % 1000000 > 500000 );
-	
-
-	//for (int i = 0; i < this->texture_height; i++)
-	//	delete rows[i];
+	//Cleanup
+	png_read_end(png, NULL);
 	delete rows;
-
-
+	png_destroy_info_struct(png, &pnginfo);
+	png_destroy_read_struct(&png, &pnginfo, NULL);	
 	std::fclose(texfile);
+
+	return 0;
 }
 
 void Model::init_buffers()
@@ -301,7 +299,7 @@ void Model::init_buffers()
 	glBindTexture(GL_TEXTURE_2D, this->texture_id);
 
 	//Pass texture data to OpenGL
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->texture_width, this->texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, this->texture );
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->texture_width, this->texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, this->texture);
 
 	//Texture settings
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -318,6 +316,9 @@ void Model::free_buffers()
 	if (this->buffers_loaded)
 	{
 		glDeleteBuffers(1, &this->vertex_buffer_id);
+		glDeleteBuffers(1, &this->uv_buffer_id);
+		glDeleteTextures(1, &this->texture_id);
+
 		this->buffers_loaded = false;
 	}
 }
@@ -327,6 +328,7 @@ void Model::draw(GLuint texture_uniform_id)
 {
 	if (!this->buffers_loaded) return;
 	
+	//Activate texturing unit
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texture_id);
 	glUniform1i(texture_uniform_id, 0);
@@ -361,6 +363,7 @@ void Model::draw(GLuint texture_uniform_id)
 	glDisableVertexAttribArray(0); //Vertex data
 	glDisableVertexAttribArray(1); //UV
 
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 }
 
