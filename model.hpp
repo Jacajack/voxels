@@ -16,10 +16,10 @@ class Model
 		std::vector <glm::vec3> normals;
 
 		//GL stuff
-		GLuint vertex_buffer;
-		bool buffer_loaded;
+		GLuint vertex_buffer_id;
+		bool buffers_loaded;
 
-		int loadFromFile(std::string filename, bool verbose);
+		int load_obj(std::string filename, bool verbose);
 		void init_buffers();
 		void free_buffers();
 
