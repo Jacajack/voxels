@@ -12,12 +12,12 @@ class Voxel
 
 		//Coordinates and size
 		float x, y, z;
-		float size;
+		float scale;
 
 	public:
 
 		//Render function
-		void draw( );
+		void draw(GLuint program_id, glm::mat4 camera_matrix);
 		Voxel( float x, float y, float z );
 };
 
