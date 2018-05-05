@@ -137,6 +137,8 @@ static int load_shaders(GLuint *program_id, std::string vertex_shader_file, std:
 //Render loop
 static void renderer_loop(GLFWwindow *window, GLuint program_id)
 {
+	glm::mat4 camera_matrix;
+
 	//TEMP
 	Voxel vox( 0, 0, 0 );
 
@@ -152,8 +154,11 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 		//Use shaders
 		glUseProgram(program_id);
 
+		//Apply view and projection matrices
+		camera_matrix = renderer::projection_matrix * renderer::view_matrix;
+
 		//Render whole map
-		vox.draw( );
+		vox.draw(program_id, camera_matrix);
 
 		//Swap buffers
 		glfwSwapBuffers(window);
@@ -219,9 +224,9 @@ void *renderer::renderer_init(void *data)
 
 	//Default view matrix
 	renderer::view_matrix = glm::lookAt(
-			glm::vec3(0, 0, 10), //Eye
-			glm::vec3(0, 0, 0),  //Center
-			glm::vec3(0, 0, 1)   //Head orientation
+			glm::vec3(4, 4, 3), //Eye
+			glm::vec3(0, 0, 0), //Center
+			glm::vec3(0, 0, 1)  //Head orientation
 		);
 
 	//Default projection matrix
@@ -250,5 +255,6 @@ void *renderer::renderer_init(void *data)
 	//Cleanup
 	//TODO
 
+	renderer::active = false;
 	return NULL;
 }
