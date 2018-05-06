@@ -298,6 +298,13 @@ void Model::init_buffers()
 	//Load UV buffer with data
 	glBufferData(GL_ARRAY_BUFFER, sizeof(this->uvs[0]) * this->uvs.size(), &this->uvs[0], GL_STATIC_DRAW);
 
+	//Create normal buffer
+	glGenBuffers(1, &this->normal_buffer_id);
+	glBindBuffer(GL_ARRAY_BUFFER, this->normal_buffer_id);
+
+	//Load normal buffer with data
+	glBufferData(GL_ARRAY_BUFFER, sizeof(this->normals[0]) * this->normals.size(), &this->normals[0], GL_STATIC_DRAW);
+
 	//Create texture
 	glGenTextures(1, &this->texture_id);
 	glBindTexture(GL_TEXTURE_2D, this->texture_id);
@@ -321,6 +328,7 @@ void Model::free_buffers()
 	{
 		glDeleteBuffers(1, &this->vertex_buffer_id);
 		glDeleteBuffers(1, &this->uv_buffer_id);
+		glDeleteBuffers(1, &this->normal_buffer_id);
 		glDeleteTextures(1, &this->texture_id);
 
 		this->buffers_loaded = false;
@@ -339,6 +347,7 @@ void Model::draw(GLuint texture_uniform_id)
 
 	glEnableVertexAttribArray(0); //Vertex data
 	glEnableVertexAttribArray(1); //UV
+	glEnableVertexAttribArray(2); //Normals
 
 	//Attribute 0 - vertex position
 	glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer_id);
@@ -362,10 +371,22 @@ void Model::draw(GLuint texture_uniform_id)
 		NULL //Array buffer offset
 	);
 
+	//Attribute 2 - Normals
+	glBindBuffer(GL_ARRAY_BUFFER, this->normal_buffer_id);
+	glVertexAttribPointer(
+		2, //Attribute ID
+		3, //Size
+		GL_FLOAT, //Type
+		GL_FALSE, //Normalized
+		0, //Stride
+		NULL //Array buffer offset
+	);
+
 	glDrawArrays(GL_TRIANGLES, 0, this->vertices.size());
 
 	glDisableVertexAttribArray(0); //Vertex data
 	glDisableVertexAttribArray(1); //UV
+	glDisableVertexAttribArray(2); //Normals
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);

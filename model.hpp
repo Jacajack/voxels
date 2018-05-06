@@ -24,7 +24,9 @@ class Model
 		//Vertex and UV buffer
 		GLuint vertex_buffer_id;
 		GLuint uv_buffer_id;
+		GLuint normal_buffer_id;
 		
+		//OpenGL buffers ready acknowledgement
 		bool buffers_loaded;
 
 		int load_obj(std::string filename, bool verbose);
