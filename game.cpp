@@ -59,7 +59,7 @@ struct
         }
 
         yaw = ((double)renderer::mouse_x / renderer::window_width) * M_PI;
-        pitch = (((double)renderer::mouse_y / renderer::window_height) - 0.5) * 3.14; //Note: this can't be full PI, because otherwise camera would flip
+        pitch = -(((double)renderer::mouse_y / renderer::window_height) - 0.5) * 3.14; //Note: this can't be full PI, because otherwise camera would flip
 
         //Calculate position and direction and generate new view matrix
         glm::vec3 pos = glm::vec3(x, y, z);
