@@ -136,7 +136,7 @@ static int load_shaders(GLuint *program_id, std::string vertex_shader_file, std:
 }
 
 //Render loop
-static void renderer_loop(GLFWwindow *window, GLuint program_id)
+static void render_loop(GLFWwindow *window, GLuint program_id)
 {
 	glm::mat4 camera_matrix;
 	glm::mat4 model_matrix;
@@ -149,9 +149,10 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 	Model monkey("models/face.obj", "models/face.png");
 
 	//Get GLSL handles
-	GLuint model_matrix_id = glGetUniformLocation(program_id, "model");
-	GLuint camera_matrix_id = glGetUniformLocation(program_id, "camera");
-	GLuint texture_uniform_id = glGetUniformLocation(program_id, "texture_sampler");
+	GLuint glsl_model_matrix_id = glGetUniformLocation(program_id, "mat_model");
+	GLuint glsl_view_matrix_id = glGetUniformLocation(program_id, "mat_view");
+	GLuint glsl_projection_matrix_id = glGetUniformLocation(program_id, "mat_projection");
+	GLuint glsl_texture_uniform_id = glGetUniformLocation(program_id, "texture_sampler");
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
@@ -168,8 +169,8 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 		glUseProgram(program_id);
 
 		//Apply view and projection matrices
-		camera_matrix = renderer::projection_matrix * renderer::view_matrix;
-		glUniformMatrix4fv(camera_matrix_id, 1, GL_FALSE, &camera_matrix[0][0]);
+		glUniformMatrix4fv(glsl_view_matrix_id, 1, GL_FALSE, &renderer::view_matrix[0][0]);
+		glUniformMatrix4fv(glsl_projection_matrix_id, 1, GL_FALSE, &renderer::projection_matrix[0][0]);
 
 
 		//Render whole map
@@ -181,8 +182,8 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 
 		//Swap buffers
 		glm::mat4 aa(1.0);
-		glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, &aa[0][0]);
-		monkey.draw(texture_uniform_id);
+		glUniformMatrix4fv(glsl_model_matrix_id, 1, GL_FALSE, &aa[0][0]);
+		monkey.draw(glsl_texture_uniform_id);
 
 		glfwSwapBuffers(window);
 
@@ -192,7 +193,7 @@ static void renderer_loop(GLFWwindow *window, GLuint program_id)
 }
 
 //Renderer init
-void *renderer::renderer_init(void *data)
+void *renderer::init(void *data)
 {
 	GLFWwindow *window;
 
@@ -273,7 +274,7 @@ void *renderer::renderer_init(void *data)
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 	
 	//Start rendering
-	renderer_loop(window, program_id);   
+	render_loop(window, program_id);   
 
 	//Cleanup
 	//TODO

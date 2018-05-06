@@ -24,7 +24,7 @@ namespace renderer
 	extern glm::mat4 projection_matrix;
 
 	//Renderer thread entry point
-	extern void *renderer_init(void *data);
+	extern void *init(void *data);
 };
 
 #endif

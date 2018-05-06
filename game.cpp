@@ -19,7 +19,7 @@ int main( int argc, char **argv )
 {
     //Start renderer thread
     pthread_t renderer_thread;
-    pthread_create( &renderer_thread, NULL, renderer::renderer_init, NULL );
+    pthread_create( &renderer_thread, NULL, renderer::init, NULL );
 
     //Rotate camera around z axis
     struct timeval t0, t1, tdiff;
