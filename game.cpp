@@ -93,6 +93,10 @@ void keyboard_callback(GLFWwindow *window, int key, int scancode, int action, in
             case GLFW_KEY_D:
                 camera.rt = true;
                 break;
+
+            case GLFW_KEY_ESCAPE:
+                renderer::active = false;
+                break;
         }
 
     if (action == GLFW_RELEASE)
@@ -119,7 +123,7 @@ void keyboard_callback(GLFWwindow *window, int key, int scancode, int action, in
 void renderer_init()
 {
     glfwSetInputMode(renderer::window, GLFW_STICKY_KEYS, GL_TRUE);
-	glfwSetInputMode(renderer::window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(renderer::window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 int main( int argc, char **argv )
