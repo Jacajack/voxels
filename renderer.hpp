@@ -31,8 +31,12 @@ namespace renderer
 	extern double mouse_x;
 	extern double mouse_y;
 
+	//Utilities
+	extern void (*on_init_callback)();
+	extern void (*on_render_callback)();
+
 	//Renderer thread entry point
-	extern void *init(void *data);
+	extern void init();
 };
 
 #endif

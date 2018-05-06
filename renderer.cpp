@@ -38,6 +38,10 @@ glm::mat4 renderer::projection_matrix;
 //Mouse
 double renderer::mouse_x, renderer::mouse_y;
 
+//Utilities
+void (*renderer::on_init_callback)() = nullptr;
+void (*renderer::on_render_callback)() = nullptr;
+
 //Shader loader
 static int load_shaders(GLuint *program_id, std::string vertex_shader_file, std::string fragment_shader_file)
 {
@@ -166,9 +170,7 @@ static void render_loop(GLFWwindow *window, GLuint program_id)
 	glUseProgram(program_id);
 
 	//Render loop
-	while (renderer::active 
-		&& glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS 
-		&& glfwWindowShouldClose(window) == 0)
+	while (renderer::active && glfwWindowShouldClose(window) == 0)
 	{
 		//This has to be locked during rendering otherwise blinking may appear
 		locked_view_matrix = renderer::view_matrix;
@@ -205,7 +207,7 @@ static void render_loop(GLFWwindow *window, GLuint program_id)
 }
 
 //Renderer init
-void *renderer::init(void *data)
+void renderer::init()
 {
 	renderer::active = true;
 
@@ -215,7 +217,6 @@ void *renderer::init(void *data)
 		std::cerr << "GLFW init failed\n";
 		renderer::error = true;
 		renderer::active = false;
-		return NULL;
 	}
 
 	//Window params
@@ -233,7 +234,6 @@ void *renderer::init(void *data)
 		glfwTerminate();
 		renderer::error = true;
 		renderer::active = false;
-		return NULL;
 	}
 
 	//GLEW init
@@ -245,7 +245,6 @@ void *renderer::init(void *data)
 		glfwTerminate();
 		renderer::error = true;
 		renderer::active = false;
-		return NULL;
 	}
 
 	//Load shaders
@@ -255,7 +254,6 @@ void *renderer::init(void *data)
 		glfwTerminate();
 		renderer::error = true;
 		renderer::active = false;
-		return NULL;
 	}
 
 	//Default view matrix
@@ -282,8 +280,8 @@ void *renderer::init(void *data)
 	glGenVertexArrays(1, &vertex_array_id);
 	glBindVertexArray(vertex_array_id);
 
-	//Input mode
-	glfwSetInputMode(renderer::window, GLFW_STICKY_KEYS, GL_TRUE);
+	//External config
+	if ( renderer::on_init_callback != nullptr ) renderer::on_init_callback( );
 	
 	//Start rendering
 	renderer::ready = true;
@@ -295,5 +293,4 @@ void *renderer::init(void *data)
 
 	renderer::active = false;
 	renderer::ready = false;
-	return NULL;
 }

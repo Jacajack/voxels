@@ -3,8 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <thread>
 
-#include <pthread.h>
 #include <sys/time.h>
 
 #include <GL/glew.h>
@@ -75,47 +75,58 @@ struct
 
 void keyboard_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_W && action == GLFW_PRESS)
-        camera.fd = true;
-    if (key == GLFW_KEY_W && action == GLFW_RELEASE)
-        camera.fd = false;
+    if (action == GLFW_PRESS)
+        switch (key)
+        {
+            case GLFW_KEY_W:
+                camera.fd = true;
+                break;
 
-    if (key == GLFW_KEY_S && action == GLFW_PRESS)
-        camera.bw = true;
-    if (key == GLFW_KEY_S && action == GLFW_RELEASE)
-        camera.bw = false;
+            case GLFW_KEY_S:
+                camera.bw = true;
+                break;
 
-    if (key == GLFW_KEY_A && action == GLFW_PRESS)
-        camera.lt = true;
-    if (key == GLFW_KEY_A && action == GLFW_RELEASE)
-        camera.lt = false;
+            case GLFW_KEY_A:
+                camera.lt = true;
+                break;
 
-     if (key == GLFW_KEY_D && action == GLFW_PRESS)
-        camera.rt = true;
-    if (key == GLFW_KEY_D && action == GLFW_RELEASE)
-        camera.rt = false;
+            case GLFW_KEY_D:
+                camera.rt = true;
+                break;
+        }
 
-    if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
-        camera.yaw +=  0.314;
+    if (action == GLFW_RELEASE)
+        switch (key)
+        {
+            case GLFW_KEY_W:
+                camera.fd = false;
+                break;
 
-    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
-        camera.yaw -=  0.314;
+            case GLFW_KEY_S:
+                camera.bw = false;
+                break;
 
-    if (key == GLFW_KEY_UP && action == GLFW_PRESS)
-        camera.pitch +=  0.314;
+            case GLFW_KEY_A:
+                camera.lt = false;
+                break;
 
-    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-        camera.pitch -=  0.314;
-
+            case GLFW_KEY_D:
+                camera.rt = false;
+                break;
+        }
 }
 
-
+void renderer_init()
+{
+    glfwSetInputMode(renderer::window, GLFW_STICKY_KEYS, GL_TRUE);
+	glfwSetInputMode(renderer::window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
 
 int main( int argc, char **argv )
 {
     //Start renderer thread
-    pthread_t renderer_thread;
-    pthread_create( &renderer_thread, NULL, renderer::init, NULL );
+    renderer::on_init_callback = renderer_init;
+    std::thread renderer_thread(renderer::init);
 
     camera.x = 0;
     camera.y = 5;
@@ -153,5 +164,5 @@ int main( int argc, char **argv )
     }
 
 	//Wait for renderer to finish
-    pthread_join( renderer_thread, NULL );
+    renderer_thread.join();
 }
