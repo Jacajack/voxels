@@ -16,10 +16,12 @@
 #include "model.hpp"
 
 //State variables
-bool renderer::active = true;
+bool renderer::active = false;
+bool renderer::ready = false;
 bool renderer::error = false;
 
-//Window properties
+//Window
+GLFWwindow *renderer::window;
 int renderer::window_width = 1024;
 int renderer::window_height = 768;
 
@@ -32,6 +34,9 @@ glm::mat4 renderer::view_matrix;
 
 //Projection matrix
 glm::mat4 renderer::projection_matrix;
+
+//Mouse
+double renderer::mouse_x, renderer::mouse_y;
 
 //Shader loader
 static int load_shaders(GLuint *program_id, std::string vertex_shader_file, std::string fragment_shader_file)
@@ -138,6 +143,7 @@ static int load_shaders(GLuint *program_id, std::string vertex_shader_file, std:
 //Render loop
 static void render_loop(GLFWwindow *window, GLuint program_id)
 {
+	glm::mat4 locked_view_matrix;
 	glm::mat4 camera_matrix;
 	glm::mat4 model_matrix;
 
@@ -156,20 +162,26 @@ static void render_loop(GLFWwindow *window, GLuint program_id)
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
+	//Use default shaders
+	glUseProgram(program_id);
+
 	//Render loop
 	while (renderer::active 
 		&& glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS 
 		&& glfwWindowShouldClose(window) == 0)
 	{
+		//This has to be locked during rendering otherwise blinking may appear
+		locked_view_matrix = renderer::view_matrix;
+
+		//Update mouse pos
+		glfwGetCursorPos(renderer::window, &renderer::mouse_x, &renderer::mouse_y);
+
 		//Clear GL buffers
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Use shaders
-		glUseProgram(program_id);
-
 		//Apply view and projection matrices
-		glUniformMatrix4fv(glsl_view_matrix_id, 1, GL_FALSE, &renderer::view_matrix[0][0]);
+		glUniformMatrix4fv(glsl_view_matrix_id, 1, GL_FALSE, &locked_view_matrix[0][0]);
 		glUniformMatrix4fv(glsl_projection_matrix_id, 1, GL_FALSE, &renderer::projection_matrix[0][0]);
 
 
@@ -185,7 +197,7 @@ static void render_loop(GLFWwindow *window, GLuint program_id)
 		glUniformMatrix4fv(glsl_model_matrix_id, 1, GL_FALSE, &aa[0][0]);
 		monkey.draw(glsl_texture_uniform_id);
 
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(renderer::window);
 
 		//Poll events
 		glfwPollEvents();
@@ -195,7 +207,7 @@ static void render_loop(GLFWwindow *window, GLuint program_id)
 //Renderer init
 void *renderer::init(void *data)
 {
-	GLFWwindow *window;
+	renderer::active = true;
 
 	//GLFW init
 	if (!glfwInit())
@@ -214,8 +226,8 @@ void *renderer::init(void *data)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	//Window creation
-	window = glfwCreateWindow(renderer::window_width, renderer::window_height, "Not only voxels, but it's already called 'voxels'...", NULL, NULL);
-	if (window == NULL)
+	renderer::window = glfwCreateWindow(renderer::window_width, renderer::window_height, "Not only voxels, but it's already called 'voxels'...", NULL, NULL);
+	if (renderer::window == NULL)
 	{
 		std::cout << "Cannot create window\n";
 		glfwTerminate();
@@ -225,7 +237,7 @@ void *renderer::init(void *data)
 	}
 
 	//GLEW init
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(renderer::window);
 	glewExperimental = true;
 	if (glewInit() != GLEW_OK)
 	{
@@ -271,14 +283,16 @@ void *renderer::init(void *data)
 	glBindVertexArray(vertex_array_id);
 
 	//Input mode
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+	glfwSetInputMode(renderer::window, GLFW_STICKY_KEYS, GL_TRUE);
 	
 	//Start rendering
-	render_loop(window, program_id);   
+	renderer::ready = true;
+	render_loop(renderer::window, program_id);   
 
 	//Cleanup
 	//TODO
 
 	renderer::active = false;
+	renderer::ready = false;
 	return NULL;
 }
