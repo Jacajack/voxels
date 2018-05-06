@@ -291,6 +291,7 @@ void *renderer::init(void *data)
 
 	//Cleanup
 	//TODO
+	glfwTerminate();
 
 	renderer::active = false;
 	renderer::ready = false;

@@ -120,6 +120,7 @@ int main( int argc, char **argv )
     camera.x = 0;
     camera.y = 5;
     camera.z = 0;
+    camera.update(0);
  
  
     //Wait for render loop to start
