@@ -22,7 +22,7 @@ void main()
 	//vec3 light_world = (mat_view * vec4(light, 1)).xyz;
 
 	//vec3 light_dir = v_pos_world - light_world;
-	f//loat theta = dot(normalize(light_dir), normalize(v_normal_camera));
+	//loat theta = dot(normalize(light_dir), normalize(v_normal_camera));
 
 	//Just apply the color from vertex shader
 	color = texture(texture_sampler, v_uv_o).rgb * cosTheta;
