@@ -1,4 +1,4 @@
-#include "shaderprogram.hpp"
+#include "shaderset.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -10,7 +10,7 @@
 #include <GLFW/glfw3.h>
 
 //Text file loader - used for shader loading
-int ShaderProgram::load_txt_file(std::string &content, std::string filename)
+int ShaderSet::load_txt_file(std::string &content, std::string filename)
 {
 	std::ifstream file(filename, std::ios::in);
 	if (file.is_open())
@@ -29,7 +29,7 @@ int ShaderProgram::load_txt_file(std::string &content, std::string filename)
 }
 
 //Load and compile single shader and return GL handle
-int ShaderProgram::load_shader( std::string filename, GLenum type )
+int ShaderSet::load_shader( std::string filename, GLenum type )
 {
 	//Get source code
 	std::string src;
@@ -63,15 +63,15 @@ int ShaderProgram::load_shader( std::string filename, GLenum type )
 	return 0;
 }
 
-void ShaderProgram::use( )
+void ShaderSet::use( )
 {
-	if ( !this->ready ) throw "ShaderProgram not ready!";
+	if ( !this->ready ) throw "ShaderSet not ready!";
 
 	glUseProgram( this->program_id );
 }
 
-//ShaderProgram constructor
-ShaderProgram::ShaderProgram( std::initializer_list <struct ShaderSpec> shader_specs, std::initializer_list <std::string> uniform_names )
+//ShaderSet constructor
+ShaderSet::ShaderSet( std::initializer_list <struct ShaderSpec> shader_specs, std::initializer_list <std::string> uniform_names )
 {
 	this->ready = false;
 
@@ -126,7 +126,7 @@ ShaderProgram::ShaderProgram( std::initializer_list <struct ShaderSpec> shader_s
 	this->ready = true;
 }
 
-ShaderProgram::~ShaderProgram( )
+ShaderSet::~ShaderSet( )
 {
 	if ( !this->ready ) return;
 	glDeleteProgram( this->program_id );

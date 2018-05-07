@@ -14,7 +14,7 @@
 //TEMP
 #include "voxel.hpp"
 #include "model.hpp"
-#include "shaderprogram.hpp"
+#include "shaderset.hpp"
 
 //State variables
 bool renderer::active = false;
@@ -25,10 +25,6 @@ bool renderer::error = false;
 GLFWwindow *renderer::window;
 int renderer::window_width = 1024;
 int renderer::window_height = 768;
-
-//Shader files
-std::string renderer::vertex_shader_file = "shaders/vertex.glsl";
-std::string renderer::fragment_shader_file = "shaders/fragment.glsl";
 
 //Camera matrix
 glm::mat4 renderer::view_matrix;
@@ -50,7 +46,7 @@ static void render_loop(GLFWwindow *window)
 	glm::mat4 camera_matrix;
 	glm::mat4 model_matrix;
 
-	ShaderProgram prog(
+	ShaderSet prog(
 		{
 			{"shaders/vertex.glsl", GL_VERTEX_SHADER},
 			{"shaders/fragment.glsl", GL_FRAGMENT_SHADER}

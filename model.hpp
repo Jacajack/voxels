@@ -8,13 +8,13 @@
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "shaderprogram.hpp"
+#include "shaderset.hpp"
 
 class Model
 {
 	private:
 		//Shader program
-		ShaderProgram &shader_program;
+		ShaderSet &shader_program;
 
 		//Model data
 		std::vector <glm::vec3> vertices;
@@ -43,8 +43,8 @@ class Model
 
 	public:
 		void draw(GLuint texture_uniform_id);
-		Model(ShaderProgram &program, std::string obj_filename, std::string texture_filename);
-		Model(ShaderProgram &program, std::string obj_filename, glm::vec3 color);
+		Model(ShaderSet &program, std::string obj_filename, std::string texture_filename);
+		Model(ShaderSet &program, std::string obj_filename, glm::vec3 color);
 		~Model();
 };
 

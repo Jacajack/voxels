@@ -19,10 +19,6 @@ namespace renderer
 	extern int window_width;
 	extern int window_height;
 
-	//Shader files
-	extern std::string vertex_shader_file;
-	extern std::string fragment_shader_file;
-
 	//View matrix
 	extern glm::mat4 view_matrix;
 	extern glm::mat4 projection_matrix;

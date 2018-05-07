@@ -10,7 +10,7 @@
 #include <libpng16/png.h>
 #include <GL/glew.h>
 
-#include "shaderprogram.hpp"
+#include "shaderset.hpp"
 
 //This is awfully slow because... guess what...
 //It uses regex!
@@ -438,7 +438,7 @@ void Model::draw(GLuint texture_uniform_id)
 }
 
 //Loader constructor
-Model::Model(ShaderProgram &shader_program, std::string obj_filename, std::string texture_filename)
+Model::Model(ShaderSet &shader_program, std::string obj_filename, std::string texture_filename)
 : shader_program(shader_program)
 {
 	this->buffers_loaded = false;
@@ -455,7 +455,7 @@ Model::Model(ShaderProgram &shader_program, std::string obj_filename, std::strin
 }
 
 //Loader constructor
-Model::Model(ShaderProgram &shader_program, std::string obj_filename, glm::vec3 color)
+Model::Model(ShaderSet &shader_program, std::string obj_filename, glm::vec3 color)
 : shader_program(shader_program)
 {
 	this->buffers_loaded = false;

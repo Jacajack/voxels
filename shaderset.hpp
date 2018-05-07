@@ -14,7 +14,7 @@ struct ShaderSpec
 };
 
 //Shader program class
-class ShaderProgram
+class ShaderSet
 {
 	private:
 		GLuint program_id;
@@ -26,8 +26,8 @@ class ShaderProgram
 	public:
 		std::map <std::string, GLuint> uniforms;
 		void use();
-		ShaderProgram( std::initializer_list <struct ShaderSpec> shader_specs, std::initializer_list <std::string> uniform_names );
-		~ShaderProgram();
+		ShaderSet( std::initializer_list <struct ShaderSpec> shader_specs, std::initializer_list <std::string> uniform_names );
+		~ShaderSet();
 };
 
 
