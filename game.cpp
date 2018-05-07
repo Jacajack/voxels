@@ -31,43 +31,43 @@ struct
         //Move forward
         if (fd)
         {
-            z += sin(pitch) * speed * dt;
+            y += sin(pitch) * speed * dt;
             x += sin(yaw) * cos(pitch) * speed * dt;
-            y += cos(yaw) * cos(pitch) * speed * dt;
+            z += cos(yaw) * cos(pitch) * speed * dt;
         }
 
         //Move backwards
         if (bw)
         {
-            z -= sin(pitch) * speed * dt;
+            y -= sin(pitch) * speed * dt;
             x -= sin(yaw) * cos(pitch) * speed * dt;
-            y -= cos(yaw) * cos(pitch) * speed * dt;
+            z -= cos(yaw) * cos(pitch) * speed * dt;
         }
 
         //Move left
         if (lt)
         {
-            x -= sin(yaw + M_PI / 2.0 ) * speed * dt;
-            y -= cos(yaw + M_PI / 2.0) * speed * dt;
+            x += sin(yaw + M_PI / 2.0 ) * speed * dt;
+            z += cos(yaw + M_PI / 2.0) * speed * dt;
         }
 
         //Move right
         if (rt)
         {
-            x -= sin(yaw - M_PI / 2.0 ) * speed * dt;
-            y -= cos(yaw - M_PI / 2.0) * speed * dt;
+            x += sin(yaw - M_PI / 2.0 ) * speed * dt;
+            z += cos(yaw - M_PI / 2.0) * speed * dt;
         }
 
-        yaw = ((double)renderer::mouse_x / renderer::window_width) * M_PI;
+        yaw = -((double)renderer::mouse_x / renderer::window_width) * M_PI;
         pitch = -(((double)renderer::mouse_y / renderer::window_height) - 0.5) * 3.14; //Note: this can't be full PI, because otherwise camera would flip
 
         //Calculate position and direction and generate new view matrix
         glm::vec3 pos = glm::vec3(x, y, z);
-        glm::vec3 dir = glm::vec3( sin(yaw) * cos(pitch), cos(yaw) * cos(pitch), sin(pitch) );
+        glm::vec3 dir = glm::vec3( sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch) );
         renderer::view_matrix = glm::lookAt(
             pos, //Where it is?
             pos + dir, //Where to look?
-            glm::vec3(0, 0, 1)  //Where is up?
+            glm::vec3(0, 1, 0)  //Where is up?
         );
     }
 } camera;
