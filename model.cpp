@@ -10,6 +10,8 @@
 #include <libpng16/png.h>
 #include <GL/glew.h>
 
+#include "shaderprogram.hpp"
+
 //This is awfully slow because... guess what...
 //It uses regex!
 int Model::load_obj(std::string filename, bool verbose)
@@ -381,6 +383,8 @@ void Model::draw(GLuint texture_uniform_id)
 {
 	if (!this->buffers_loaded) return;
 	
+	this->shader_program.use( );
+
 	//Activate texturing unit
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texture_id);
@@ -434,7 +438,8 @@ void Model::draw(GLuint texture_uniform_id)
 }
 
 //Loader constructor
-Model::Model(std::string obj_filename, std::string texture_filename)
+Model::Model(ShaderProgram &shader_program, std::string obj_filename, std::string texture_filename)
+: shader_program(shader_program)
 {
 	this->buffers_loaded = false;
 	this->texture_loaded = false;
@@ -450,7 +455,8 @@ Model::Model(std::string obj_filename, std::string texture_filename)
 }
 
 //Loader constructor
-Model::Model(std::string obj_filename, glm::vec3 color)
+Model::Model(ShaderProgram &shader_program, std::string obj_filename, glm::vec3 color)
+: shader_program(shader_program)
 {
 	this->buffers_loaded = false;
 	this->texture_loaded = false;

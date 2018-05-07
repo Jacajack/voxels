@@ -64,11 +64,7 @@ static void render_loop(GLFWwindow *window)
 	);
 
 	//TEMP
-	Voxel voxa( 0, 0, 0 );
-	Voxel voxb( 0, 0, 1 );
-	Voxel voxc( 0, 1, 0 );
-	Voxel voxd( 1, 0, 0 );
-	Model monkey("models/uni.obj", "models/uni.png");
+	Model monkey(prog, "models/uni.obj", "models/uni.png");
 
 	//Get GLSL handles
 
