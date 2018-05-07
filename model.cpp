@@ -319,6 +319,7 @@ int Model::load_texture(std::string filename, bool verbose)
 	std::fclose(texfile);
 
 	if (verbose) std::cerr << "Done texture file (" << this->texture_width << "x" << this->texture_height << ")\n";
+	this->texture_loaded = true;
 
 	return 0;
 }
@@ -388,9 +389,12 @@ void Model::draw()
 	glUniform4fv( this->shaderset.uniforms["model_tint"], 1, &this->tint[0] );
 
 	//Activate texturing unit
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, this->texture_id);
-	glUniform1i(this->shaderset.uniforms["texture_sampler"], 0);
+	if ( this->texture_loaded )
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, this->texture_id);
+		glUniform1i(this->shaderset.uniforms["texture_sampler"], 0);
+	}
 
 	glEnableVertexAttribArray(0); //Vertex data
 	glEnableVertexAttribArray(1); //UV
@@ -480,24 +484,13 @@ Model::~Model()
 //Composite model draw routine
 void CompositeModel::draw( )
 {
-	if ( this->use_refs )
-		for ( Model *model : this->submodel_refs )
-			model->draw( );
-	else
-		for ( Model model : this->submodels )
-			model.draw( );
+	for ( Model *model : this->submodels )
+		model->draw( );
 }
 
-//Composite model constructor
-CompositeModel::CompositeModel(std::initializer_list <Model*> model_refs)
-	: submodel_refs(model_refs)
-{
-	this->use_refs = true;
-}
 
 //Composite model constructor
-CompositeModel::CompositeModel(std::initializer_list <Model> models)
+CompositeModel::CompositeModel(std::initializer_list <Model*> models)
 	: submodels(models)
 {
-	this->use_refs = false;
 }

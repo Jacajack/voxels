@@ -15,6 +15,7 @@
 #include "voxel.hpp"
 #include "model.hpp"
 #include "shaderset.hpp"
+#include "actor.hpp"
 
 //State variables
 bool renderer::active = false;
@@ -62,7 +63,13 @@ static void render_loop(GLFWwindow *window)
 	);
 
 	//TEMP
-	Model monkey(*prog, "models/uni.obj", glm::vec3(1.0, 1.0, 0.0));
+	//Model monkey(*prog, "models/uni.obj", glm::vec3(1.0, 1.0, 0.0));
+	Actor unicorn(
+		{
+			new Model(*prog, "models/uni.obj", "models/uni.png")
+		}
+	);
+	unicorn.rotation = glm::vec3( M_PI, 0, M_PI );
 
 	//Get GLSL handles
 
@@ -110,7 +117,8 @@ static void render_loop(GLFWwindow *window)
 		//Swap buffers
 		glm::mat4 aa(1.0);
 		glUniformMatrix4fv(glsl_model_matrix_id, 1, GL_FALSE, &aa[0][0]);
-		monkey.draw();
+		//monkey.draw();
+		unicorn.draw();
 
 		glfwSwapBuffers(renderer::window);
 
