@@ -14,6 +14,7 @@
 //TEMP
 #include "voxel.hpp"
 #include "model.hpp"
+#include "shaderprogram.hpp"
 
 //State variables
 bool renderer::active = false;
@@ -42,102 +43,25 @@ double renderer::mouse_x, renderer::mouse_y;
 void (*renderer::on_init_callback)() = nullptr;
 void (*renderer::on_render_callback)() = nullptr;
 
-//Text file loader - used for shader loading
-static int load_txt_file(std::string &content, std::string filename)
-{
-	std::ifstream file(filename, std::ios::in);
-	if (file.is_open())
-	{
-		std::stringstream sstr;
-		sstr << file.rdbuf();
-		content = sstr.str();
-		file.close();
-	}
-	else
-	{
-		std::cerr << "Cannot read file '" << filename << "'\n";
-		return 1;
-	}
-	return 0;
-}
-
-//Load and compile single shader and return GL handle
-static int load_shader(GLuint &shader, std::string filename, GLenum type)
-{
-	//Create shader
-	shader = glCreateShader(type);
-
-	//Get source code
-	std::string src;
-	const char *csrc;
-	if (load_txt_file(src, filename))
-		return 1;
-	csrc = src.c_str();
-	glShaderSource(shader, 1, &csrc, NULL);
-
-	//Compilation results
-	int loglength = 0;
-	GLint result = GL_FALSE;
-
-	//Compile shader
-	glCompileShader(shader);
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
-	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &loglength);
-	if (loglength > 0)
-	{
-		std::vector <char> mesg(loglength + 1);
-		glGetShaderInfoLog(shader, loglength, NULL, &mesg[0]);
-		std::cerr << ">\t" << &mesg[0] << "\n";
-	}
-
-	return 0;
-}
-
-//Shader loader
-static int load_shaders(GLuint *program_id, std::string vertex_shader_file, std::string fragment_shader_file)
-{
-	GLuint vertex_shader_id; //= glCreateShader(GL_VERTEX_SHADER);
-	GLuint fragment_shader_id;// = glCreateShader(GL_FRAGMENT_SHADER);
-
-	load_shader(vertex_shader_id, "shaders/vertex.glsl", GL_VERTEX_SHADER);
-	load_shader(fragment_shader_id, "shaders/fragment.glsl", GL_FRAGMENT_SHADER);
-
-	//Create program
-	std::cerr << "Creating program...\n";
-	*program_id = glCreateProgram();
-	glAttachShader(*program_id, vertex_shader_id);
-	glAttachShader(*program_id, fragment_shader_id);
-	glLinkProgram(*program_id);
-
-	//Compilation and linking results
-	int loglength = 0;
-	GLint result = GL_FALSE;
-
-	//Check program
-	glGetProgramiv(*program_id, GL_LINK_STATUS, &result);
-	glGetProgramiv(*program_id, GL_INFO_LOG_LENGTH, &loglength);
-	if (loglength > 0)
-	{
-		std::vector <char> mesg(loglength + 1);
-		glGetProgramInfoLog(*program_id, loglength, NULL, &mesg[0]);
-		std::cout << ">\t" << &mesg[0] << "\n";
-	}
-
-	glDetachShader(*program_id, vertex_shader_id);
-	glDetachShader(*program_id, fragment_shader_id);
-	glDeleteShader(vertex_shader_id);
-	glDeleteShader(fragment_shader_id);
-
-	//Succesful exit
-	return 0;
-}
-
 //Render loop
-static void render_loop(GLFWwindow *window, GLuint program_id)
+static void render_loop(GLFWwindow *window)
 {
 	glm::mat4 locked_view_matrix;
 	glm::mat4 camera_matrix;
 	glm::mat4 model_matrix;
+
+	ShaderProgram prog(
+		{
+			{"shaders/vertex.glsl", GL_VERTEX_SHADER},
+			{"shaders/fragment.glsl", GL_FRAGMENT_SHADER}
+		}, 
+		{
+			"mat_model",
+			"mat_view",
+			"mat_projection",
+			"texture_sampler"
+		}
+	);
 
 	//TEMP
 	Voxel voxa( 0, 0, 0 );
@@ -147,15 +71,18 @@ static void render_loop(GLFWwindow *window, GLuint program_id)
 	Model monkey("models/uni.obj", "models/uni.png");
 
 	//Get GLSL handles
-	GLuint glsl_model_matrix_id = glGetUniformLocation(program_id, "mat_model");
-	GLuint glsl_view_matrix_id = glGetUniformLocation(program_id, "mat_view");
-	GLuint glsl_projection_matrix_id = glGetUniformLocation(program_id, "mat_projection");
-	GLuint glsl_texture_uniform_id = glGetUniformLocation(program_id, "texture_sampler");
+
+
+	GLuint glsl_model_matrix_id = prog.uniforms["mat_model"]; //glGetUniformLocation(program_id, "mat_model");
+	GLuint glsl_view_matrix_id = prog.uniforms["mat_view"]; //glGetUniformLocation(program_id, "mat_view");
+	GLuint glsl_projection_matrix_id = prog.uniforms["mat_projection"]; //glGetUniformLocation(program_id, "mat_projection");
+	GLuint glsl_texture_uniform_id = prog.uniforms["texture_sampler"]; //glGetUniformLocation(program_id, "texture_sampler");
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	//Use default shaders
-	glUseProgram(program_id);
+	//glUseProgram(program_id);
+	prog.use( );
 
 	//Render loop
 	while (renderer::active && glfwWindowShouldClose(window) == 0)
@@ -235,15 +162,6 @@ void renderer::init()
 		renderer::active = false;
 	}
 
-	//Load shaders
-	GLuint program_id;
-	if (load_shaders(&program_id, renderer::vertex_shader_file, renderer::fragment_shader_file))
-	{
-		glfwTerminate();
-		renderer::error = true;
-		renderer::active = false;
-	}
-
 	//Default view matrix
 	renderer::view_matrix = glm::lookAt(
 			glm::vec3(4, 4, 3), //Eye
@@ -273,7 +191,7 @@ void renderer::init()
 	
 	//Start rendering
 	renderer::ready = true;
-	render_loop(renderer::window, program_id);   
+	render_loop(renderer::window);   
 
 	//Cleanup
 	//TODO
