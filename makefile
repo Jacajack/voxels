@@ -7,7 +7,7 @@ SRC = game.cpp renderer.cpp voxel.cpp model.cpp shaderset.cpp
 
 all:
 	-rm game
-	$(CXX) $(CXXFLGAS) $(SRC) $(LIBS) -o game    
+	$(CXX) $(CXXFLAGS) $(SRC) $(LIBS) -o game    
 
 install_deps:
 	apt install `cat deps.txt`
