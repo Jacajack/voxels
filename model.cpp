@@ -485,7 +485,7 @@ void CompositeModel::draw( )
 }
 
 //Composite model constructor
-CompositeModel::CompositeModel(std::initializer_list <Model> models)
+CompositeModel::CompositeModel(std::initializer_list <Model&> models)
 	: submodels(models)
 {
 }
