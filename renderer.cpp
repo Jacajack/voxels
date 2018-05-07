@@ -58,20 +58,53 @@ static void render_loop(GLFWwindow *window)
 	};
 	ShaderSet *prog = new ShaderSet(
 		{
-			{"shaders/vertex.glsl", GL_VERTEX_SHADER},
-			{"shaders/fragment.glsl", GL_FRAGMENT_SHADER}
+			{"shaders/fake-depth/vertex.glsl", GL_VERTEX_SHADER},
+			{"shaders/fake-depth/fragment.glsl", GL_FRAGMENT_SHADER}
 		}, 
 		shared_uniforms
 	);
 
 	//TEMP
 	//Model monkey(*prog, "models/uni.obj", glm::vec3(1.0, 1.0, 0.0));
+	
 	Actor unicorn(
 		{
 			new Model(*prog, "models/uni.obj", "models/uni.png")
 		}
 	);
-	unicorn.rotation = glm::vec3( M_PI, 0, M_PI );
+	unicorn.rotation = glm::vec3(M_PI_2, M_PI, M_PI_2 );
+	unicorn.position.y = 2;
+	unicorn.position.x = -5;
+
+	Actor tree(
+		{
+			new Model( *prog, "models/tree-top.obj", glm::vec3( 0.6, 1.0, 0.6 ) ),
+			new Model( *prog, "models/tree-trunk.obj", glm::vec3( 0.448, 0.228, 0.162 ) )
+		}
+	);
+	tree.rotation.y = M_PI;
+
+	std::vector <Actor*> forest;
+	for ( int i = 0; i < 64; i++ )
+	{
+		/*
+		Actor *t = new Actor(
+			{
+				new Model( *prog, "models/tree-top.obj", glm::vec3( 0.6, 1.0, 0.6 ) ),
+				new Model( *prog, "models/tree-trunk.obj", glm::vec3( 0.448, 0.228, 0.162 ) )
+			}
+		);
+		*/
+		Actor *t = new Actor( tree );
+
+		t->position.x = (rand() % 1000 / 1000.0) * 100.0 - 50;
+		t->position.z = (rand() % 1000 / 1000.0) * 100.0 - 50;
+		t->rotation.y = (rand() % 1000 / 1000.0) * 2 * M_PI;
+
+		forest.push_back(t);
+		//t->position = glm::vec3( 5, 0, 0);
+	}
+
 
 	//Get GLSL handles
 
@@ -117,10 +150,17 @@ static void render_loop(GLFWwindow *window)
 		
 
 		//Swap buffers
-		glm::mat4 aa(1.0);
-		glUniformMatrix4fv(glsl_model_matrix_id, 1, GL_FALSE, &aa[0][0]);
+		//glm::mat4 aa(1.0);
+		//glUniformMatrix4fv(glsl_model_matrix_id, 1, GL_FALSE, &aa[0][0]);
 		//monkey.draw();
 		unicorn.draw();
+		tree.draw();
+
+		for ( int i = 0; i < forest.size(); i++ )
+			forest[i]->draw( );
+
+		//for ( Actor *t : forest )
+		//	t->draw();
 
 		glfwSwapBuffers(renderer::window);
 
