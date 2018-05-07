@@ -129,5 +129,5 @@ ShaderSet::ShaderSet( std::initializer_list <struct ShaderSpec> shader_specs, st
 ShaderSet::~ShaderSet( )
 {
 	if ( !this->ready ) return;
-	glDeleteProgram( this->program_id );
+	//glDeleteProgram( this->program_id );
 }

@@ -14,7 +14,7 @@ class Model
 {
 	private:
 		//Shader program
-		ShaderSet &shader_program;
+		ShaderSet &shaderset;
 
 		//Model data
 		std::vector <glm::vec3> vertices;
@@ -42,10 +42,19 @@ class Model
 		void free_buffers();
 
 	public:
-		void draw(GLuint texture_uniform_id);
+		void draw();
 		Model(ShaderSet &program, std::string obj_filename, std::string texture_filename);
 		Model(ShaderSet &program, std::string obj_filename, glm::vec3 color);
 		~Model();
+};
+
+class CompositeModel
+{
+	private:
+		std::vector <Model> submodels;
+
+	//public:
+	//	void 
 };
 
 #endif

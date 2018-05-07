@@ -46,7 +46,7 @@ static void render_loop(GLFWwindow *window)
 	glm::mat4 camera_matrix;
 	glm::mat4 model_matrix;
 
-	ShaderSet prog(
+	ShaderSet *prog = new ShaderSet(
 		{
 			{"shaders/vertex.glsl", GL_VERTEX_SHADER},
 			{"shaders/fragment.glsl", GL_FRAGMENT_SHADER}
@@ -55,26 +55,26 @@ static void render_loop(GLFWwindow *window)
 			"mat_model",
 			"mat_view",
 			"mat_projection",
-			"texture_sampler"
+			"texture_sampler",
+			"model_tint"
 		}
 	);
 
 	//TEMP
-	Model monkey(prog, "models/uni.obj", "models/uni.png");
+	Model monkey(*prog, "models/uni.obj", glm::vec3(1.0, 1.0, 0.0));
 
 	//Get GLSL handles
 
 
-	GLuint glsl_model_matrix_id = prog.uniforms["mat_model"]; //glGetUniformLocation(program_id, "mat_model");
-	GLuint glsl_view_matrix_id = prog.uniforms["mat_view"]; //glGetUniformLocation(program_id, "mat_view");
-	GLuint glsl_projection_matrix_id = prog.uniforms["mat_projection"]; //glGetUniformLocation(program_id, "mat_projection");
-	GLuint glsl_texture_uniform_id = prog.uniforms["texture_sampler"]; //glGetUniformLocation(program_id, "texture_sampler");
+	GLuint glsl_model_matrix_id = prog->uniforms["mat_model"]; //glGetUniformLocation(program_id, "mat_model");
+	GLuint glsl_view_matrix_id = prog->uniforms["mat_view"]; //glGetUniformLocation(program_id, "mat_view");
+	GLuint glsl_projection_matrix_id = prog->uniforms["mat_projection"]; //glGetUniformLocation(program_id, "mat_projection");
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	//Use default shaders
 	//glUseProgram(program_id);
-	prog.use( );
+	prog->use( );
 
 	//Render loop
 	while (renderer::active && glfwWindowShouldClose(window) == 0)
@@ -104,13 +104,15 @@ static void render_loop(GLFWwindow *window)
 		//Swap buffers
 		glm::mat4 aa(1.0);
 		glUniformMatrix4fv(glsl_model_matrix_id, 1, GL_FALSE, &aa[0][0]);
-		monkey.draw(glsl_texture_uniform_id);
+		monkey.draw();
 
 		glfwSwapBuffers(renderer::window);
 
 		//Poll events
 		glfwPollEvents();
 	}
+
+	delete prog;
 }
 
 //Renderer init

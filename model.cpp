@@ -379,16 +379,18 @@ void Model::free_buffers()
 }
 
 //Just draw the model
-void Model::draw(GLuint texture_uniform_id)
+void Model::draw()
 {
 	if (!this->buffers_loaded) return;
 	
-	this->shader_program.use( );
+	this->shaderset.use( );
+
+	glUniform4fv( this->shaderset.uniforms["model_tint"], 1, &this->tint[0] );
 
 	//Activate texturing unit
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texture_id);
-	glUniform1i(texture_uniform_id, 0);
+	glUniform1i(this->shaderset.uniforms["texture_sampler"], 0);
 
 	glEnableVertexAttribArray(0); //Vertex data
 	glEnableVertexAttribArray(1); //UV
@@ -439,7 +441,7 @@ void Model::draw(GLuint texture_uniform_id)
 
 //Loader constructor
 Model::Model(ShaderSet &shader_program, std::string obj_filename, std::string texture_filename)
-: shader_program(shader_program)
+: shaderset(shader_program)
 {
 	this->buffers_loaded = false;
 	this->texture_loaded = false;
@@ -456,11 +458,11 @@ Model::Model(ShaderSet &shader_program, std::string obj_filename, std::string te
 
 //Loader constructor
 Model::Model(ShaderSet &shader_program, std::string obj_filename, glm::vec3 color)
-: shader_program(shader_program)
+: shaderset(shader_program)
 {
 	this->buffers_loaded = false;
 	this->texture_loaded = false;
-	this->tint = glm::vec4(color, 1);
+	this->tint = glm::vec4(color, 1.0);
 
 	if ( !this->load_obj(obj_filename, true) )
 	{
@@ -472,5 +474,5 @@ Model::Model(ShaderSet &shader_program, std::string obj_filename, glm::vec3 colo
 Model::~Model()
 {
 	this->free_buffers();
-	delete this->texture;
+	if ( this->texture_loaded ) delete this->texture;
 }
