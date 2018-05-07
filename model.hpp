@@ -16,10 +16,12 @@ class Model
 		std::vector <glm::vec2> uvs;
 		std::vector <glm::vec3> normals;
 
-		//Texture
+		//Texture or color
+		glm::vec4 tint;
 		GLuint texture_id;
 		unsigned char *texture;
-		int texture_width, texture_height;
+		int texture_width, texture_height, texture_format;
+		bool texture_loaded;
 
 		//Vertex and UV buffer
 		GLuint vertex_buffer_id;
@@ -37,6 +39,7 @@ class Model
 	public:
 		void draw(GLuint texture_uniform_id);
 		Model(std::string obj_filename, std::string texture_filename);
+		Model(std::string obj_filename, glm::vec3 color);
 		~Model();
 };
 

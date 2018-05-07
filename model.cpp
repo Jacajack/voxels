@@ -238,22 +238,63 @@ int Model::load_texture(std::string filename, bool verbose)
 	png_read_info(png, pnginfo);
 	this->texture_width = png_get_image_width(png, pnginfo);
 	this->texture_height = png_get_image_height(png, pnginfo);
-	png_byte color_type = png_get_color_type(png, pnginfo);
 	png_byte bit_depth = png_get_bit_depth(png, pnginfo);
+	if (verbose) std::cerr << "PNG bit depth " << bit_depth << "\n";
 
-	//Force 8-bit RGB space
-	if (bit_depth == 16) png_set_strip_16(png);
-	if (color_type == PNG_COLOR_TYPE_PALETTE) png_set_palette_to_rgb(png);
-	if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) png_set_expand_gray_1_2_4_to_8(png);
+	//Convert tRNS to alpha
 	if (png_get_valid(png, pnginfo, PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png);
-	if (color_type == PNG_COLOR_TYPE_GRAY
-		|| color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-    		png_set_gray_to_rgb(png);
+	
+	//Determine format
+	switch(png_get_color_type(png, pnginfo))
+	{
+		//Grayscale image
+		case PNG_COLOR_TYPE_GRAY:
+			this->texture_format = GL_RGB;
+			png_set_gray_to_rgb(png);
+			if (verbose) std::cerr << "Grayscale PNG - converting\n";
+			break;
+
+		//Grayscale + alpha
+		case PNG_COLOR_TYPE_GRAY_ALPHA:
+			this->texture_format = GL_RGBA;
+			png_set_gray_to_rgb(png);
+			if (verbose) std::cerr << "Grayscale + alpha PNG - converting\n";
+			break;
+		
+		//Palette
+		case PNG_COLOR_TYPE_PALETTE:
+			this->texture_format = GL_RGB;
+			png_set_expand(png);
+			if (verbose) std::cerr << "Palette PNG - converting\n";
+			break;
+
+		//RGB
+		case PNG_COLOR_TYPE_RGB:
+			this->texture_format = GL_RGB;
+			if (verbose) std::cerr << "RGB PNG - fine\n";
+			break;
+		
+		//RGBA
+		case PNG_COLOR_TYPE_RGBA:
+			this->texture_format = GL_RGBA;
+			if (verbose) std::cerr << "RGBA PNG - fine\n";
+			break;
+
+		default:	
+			std::cerr << "Unhandled PNG format - exiting!\n";
+			png_destroy_info_struct(png, &pnginfo);
+			png_destroy_read_struct(&png, &pnginfo, NULL);	
+			std::fclose(texfile);
+			return 1;
+			break;
+	}
+
 	png_set_interlace_handling(png);
 	png_read_update_info(png, pnginfo);
 
 	//This is linear texture buffer
-	this->texture = new unsigned char[this->texture_width * this->texture_height * 3];
+	int bpp = this->texture_format == GL_RGB ? 3 : 4;
+	this->texture = new unsigned char[this->texture_width * this->texture_height * bpp];
 
 	//And this tricks libpng to read data into my linear bufer buahaha
 	//Note: BMPs are upside down while PNGs are not
@@ -262,7 +303,7 @@ int Model::load_texture(std::string filename, bool verbose)
 	for (int i = this->texture_height - 1; i >= 0; i--)
 	{
 		rows[i] = p;
-		p += this->texture_width * 3;
+		p += this->texture_width * bpp;
 	}
 
 	//Read data
@@ -310,7 +351,7 @@ void Model::init_buffers()
 	glBindTexture(GL_TEXTURE_2D, this->texture_id);
 
 	//Pass texture data to OpenGL
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->texture_width, this->texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, this->texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->texture_width, this->texture_height, 0, this->texture_format, GL_UNSIGNED_BYTE, this->texture);
 
 	//Texture settings
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -396,7 +437,8 @@ void Model::draw(GLuint texture_uniform_id)
 Model::Model(std::string obj_filename, std::string texture_filename)
 {
 	this->buffers_loaded = false;
-
+	this->texture_loaded = false;
+	this->tint = glm::vec4(0.0);
 
 	if ( !this->load_obj(obj_filename, true) )
 	{
@@ -404,6 +446,19 @@ Model::Model(std::string obj_filename, std::string texture_filename)
 		{
 			this->init_buffers();
 		}
+	}
+}
+
+//Loader constructor
+Model::Model(std::string obj_filename, glm::vec3 color)
+{
+	this->buffers_loaded = false;
+	this->texture_loaded = false;
+	this->tint = glm::vec4(color, 1);
+
+	if ( !this->load_obj(obj_filename, true) )
+	{
+		this->init_buffers();
 	}
 }
 
