@@ -33,6 +33,8 @@ namespace renderer
 
 	//Renderer thread entry point
 	extern void init();
+	extern void lock( );
+	extern void unlock( );
 };
 
 #endif

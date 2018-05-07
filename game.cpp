@@ -122,6 +122,7 @@ void keyboard_callback(GLFWwindow *window, int key, int scancode, int action, in
 
 void renderer_init()
 {
+    glfwSetKeyCallback(renderer::window, keyboard_callback);
     glfwSetInputMode(renderer::window, GLFW_STICKY_KEYS, GL_TRUE);
 	//glfwSetInputMode(renderer::window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
@@ -137,11 +138,8 @@ int main( int argc, char **argv )
     camera.z = 0;
     camera.update(0);
  
- 
     //Wait for render loop to start
     while (!renderer::ready);
-
-    glfwSetKeyCallback(renderer::window, keyboard_callback);
 
     //Rotate camera around z axis
     struct timeval t0, t1, tdiff;

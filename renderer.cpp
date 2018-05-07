@@ -40,6 +40,7 @@ void (*renderer::on_init_callback)() = nullptr;
 void (*renderer::on_render_callback)() = nullptr;
 
 //Render loop
+static bool render_lock_rq = false, render_lock_ack = false;
 static void render_loop(GLFWwindow *window)
 {
 	glm::mat4 locked_view_matrix;
@@ -79,6 +80,11 @@ static void render_loop(GLFWwindow *window)
 	//Render loop
 	while (renderer::active && glfwWindowShouldClose(window) == 0)
 	{
+		//Render loop spinlock
+		if ( render_lock_rq ) render_lock_ack = 1;
+		while ( render_lock_rq );
+		render_lock_ack = false;
+
 		//This has to be locked during rendering otherwise blinking may appear
 		locked_view_matrix = renderer::view_matrix;
 
@@ -193,4 +199,18 @@ void renderer::init()
 
 	renderer::active = false;
 	renderer::ready = false;
+}
+
+void renderer::lock( )
+{
+	if ( render_lock_ack == false )
+	{
+		render_lock_rq = true;
+		while ( render_lock_ack == false );
+	}
+}
+
+void renderer::unlock( )
+{
+	render_lock_rq = false;
 }
