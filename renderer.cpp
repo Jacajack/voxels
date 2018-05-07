@@ -48,18 +48,20 @@ static void render_loop(GLFWwindow *window)
 	glm::mat4 camera_matrix;
 	glm::mat4 model_matrix;
 
+	std::initializer_list <std::string> shared_uniforms = 
+	{
+		"mat_model",
+		"mat_view",
+		"mat_projection",
+		"texture_sampler",
+		"model_tint"
+	};
 	ShaderSet *prog = new ShaderSet(
 		{
 			{"shaders/vertex.glsl", GL_VERTEX_SHADER},
 			{"shaders/fragment.glsl", GL_FRAGMENT_SHADER}
 		}, 
-		{
-			"mat_model",
-			"mat_view",
-			"mat_projection",
-			"texture_sampler",
-			"model_tint"
-		}
+		shared_uniforms
 	);
 
 	//TEMP
