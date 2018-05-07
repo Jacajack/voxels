@@ -476,3 +476,16 @@ Model::~Model()
 	this->free_buffers();
 	if ( this->texture_loaded ) delete this->texture;
 }
+
+//Composite model draw routine
+void CompositeModel::draw( )
+{
+	for ( Model model : this->submodels )
+		model.draw( );
+}
+
+//Composite model constructor
+CompositeModel::CompositeModel(std::initializer_list <Model> models)
+	: submodels(models)
+{
+}

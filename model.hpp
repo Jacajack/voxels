@@ -53,8 +53,9 @@ class CompositeModel
 	private:
 		std::vector <Model> submodels;
 
-	//public:
-	//	void 
+	public:
+		CompositeModel(std::initializer_list <Model> models);
+		void draw();
 };
 
 #endif
