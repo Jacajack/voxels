@@ -51,10 +51,13 @@ class Model
 class CompositeModel
 {
 	private:
-		std::vector <Model&> submodels;
+		std::vector <Model> submodels;
+		std::vector <Model*> submodel_refs;
+		bool use_refs;
 
 	public:
-		CompositeModel(std::initializer_list <Model&> models);
+		CompositeModel(std::initializer_list <Model> models);
+		CompositeModel(std::initializer_list <Model*> model_refs);
 		void draw();
 };
 

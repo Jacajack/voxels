@@ -480,12 +480,24 @@ Model::~Model()
 //Composite model draw routine
 void CompositeModel::draw( )
 {
-	for ( Model model : this->submodels )
-		model.draw( );
+	if ( this->use_refs )
+		for ( Model *model : this->submodel_refs )
+			model->draw( );
+	else
+		for ( Model model : this->submodels )
+			model.draw( );
 }
 
 //Composite model constructor
-CompositeModel::CompositeModel(std::initializer_list <Model&> models)
+CompositeModel::CompositeModel(std::initializer_list <Model*> model_refs)
+	: submodel_refs(model_refs)
+{
+	this->use_refs = true;
+}
+
+//Composite model constructor
+CompositeModel::CompositeModel(std::initializer_list <Model> models)
 	: submodels(models)
 {
+	this->use_refs = false;
 }
