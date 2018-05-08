@@ -36,6 +36,10 @@ namespace renderer
 	//View matrix
 	extern glm::mat4 view_matrix;
 	extern glm::mat4 projection_matrix;
+	
+	//TEMP sun
+	extern glm::vec3 sun_pos;
+	extern glm::vec3 sun_dir;
 
 	//Mouse position
 	extern double mouse_x;

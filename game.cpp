@@ -137,6 +137,8 @@ int main( int argc, char **argv )
     camera.y = 5;
     camera.z = 0;
     camera.update(0);
+
+
  
     //Wait for render loop to start
     while (!renderer::ready);
@@ -150,6 +152,10 @@ int main( int argc, char **argv )
     double angle = 0;
     while (renderer::active)
     {
+        //renderer::sun_pos = glm::vec3( camera.x + 5 * sin(camera.yaw), 25, camera.z + 5 * cos(camera.yaw) );
+        renderer::sun_pos = glm::vec3( camera.x, 25, camera.z );
+        renderer::sun_dir = glm::vec3(0.5, -1, 0 );
+
         t0 = t1;
         gettimeofday(&t1, NULL);
         timersub(&t1, &t0, &tdiff);

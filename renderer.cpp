@@ -33,6 +33,8 @@ glm::mat4 renderer::view_matrix;
 //Projection matrix
 glm::mat4 renderer::projection_matrix;
 
+glm::vec3 renderer::sun_pos, renderer::sun_dir;
+
 //Mouse
 double renderer::mouse_x, renderer::mouse_y;
 
@@ -90,7 +92,8 @@ static void render_loop(GLFWwindow *window)
 	);
 	unicorn.rotation = glm::vec3(M_PI_2, M_PI, M_PI_2 );
 	unicorn.position.y = 2.5;
-	unicorn.position.x = -5;
+	unicorn.position.x = 10;
+	unicorn.scale = glm::vec3(1);
 
 	Actor tree(
 		{
@@ -102,23 +105,15 @@ static void render_loop(GLFWwindow *window)
 
 	Actor ground(
 		{
-			new Model( *prog, "models/ground.obj", /*glm::vec3( 1, 1, 1 )*/ "models/uni.png" ),
+			new Model( *prog, "models/ground.obj", glm::vec3( 1, 1, 1 ) ),
 		}
 	);
-	ground.scale = glm::vec3( 1 );
+	ground.scale = glm::vec3( 10, 1, 10 );
 
 
 	std::vector <Actor*> forest;
-	for ( int i = 0; i < 64; i++ )
+	for ( int i = 0; i < 15; i++ )
 	{
-		/*
-		Actor *t = new Actor(
-			{
-				new Model( *prog, "models/tree-top.obj", glm::vec3( 0.6, 1.0, 0.6 ) ),
-				new Model( *prog, "models/tree-trunk.obj", glm::vec3( 0.448, 0.228, 0.162 ) )
-			}
-		);
-		*/
 		Actor *t = new Actor( tree );
 
 		t->position.x = (rand() % 1000 / 1000.0) * 100.0 - 50;
@@ -129,52 +124,23 @@ static void render_loop(GLFWwindow *window)
 		//t->position = glm::vec3( 5, 0, 0);
 	}
 
-
-	//Get GLSL handles
-
-
-	//GLuint glsl_model_matrix_id = prog->uniforms["mat_model"]; //glGetUniformLocation(program_id, "mat_model");
-	//GLuint glsl_view_matrix_id = prog->uniforms["mat_view"]; //glGetUniformLocation(program_id, "mat_view");
-	//GLuint glsl_projection_matrix_id = prog->uniforms["mat_projection"]; //glGetUniformLocation(program_id, "mat_projection");
-	//GLuint sun = prog->uniforms["sun_view"];
-
 	renderer::RenderContext context;
-	//context.shaderset = prog;
-	
-
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-	//Use default shaders
-	//glUseProgram(program_id);
-	//prog->use( );
-
-
-
 	//Shadow buffer
-	
 	GLuint fbuffer;
-	glGenFramebuffers(1, &fbuffer);
-	
-	
+	glGenFramebuffers(1, &fbuffer);	
 	GLuint depthtex;
 	glGenTextures( 1, &depthtex );
 	glBindTexture( GL_TEXTURE_2D, depthtex );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
-	/*
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-	*/
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 4096, 4096, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
-	
-	//glDrawBuffer( GL_NONE );
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float border_color[] = {1, 1, 1, 1};
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
 
 	glBindFramebuffer( GL_FRAMEBUFFER, fbuffer );	
 	glBindTexture( GL_TEXTURE_2D, depthtex );
@@ -194,9 +160,17 @@ static void render_loop(GLFWwindow *window)
 		//This has to be locked during rendering otherwise blinking may appear
 		context.view_matrix = renderer::view_matrix;
 		context.projection_matrix = renderer::projection_matrix;
-		context.sun_view = glm::ortho <float> (-10, 10, -10, 10, -10, 20 ) *  glm::lookAt( 
-			glm::vec3( 10, 10, 0 ),
-			glm::vec3( 0, 0, 0 ),
+		//context.sun_view = /*glm::ortho <float> (-20, 20, -20, 20, -20, 20 ) * */  
+		/*glm::perspective( glm::radians( 90.0 ), 1.0, 0.1, 100.0 );*/
+
+		glm::vec3 sun_p = renderer::sun_pos;;
+		glm::vec3 sun_d = renderer::sun_dir;
+
+		context.sun_view =
+		glm::ortho <float> (-20, 20, -20, 20, 1, 30 ) * 
+		glm::lookAt( 
+			sun_p,
+			sun_p + sun_d,
 			glm::vec3( 0, 1, 0 )
 		);
 		context.depth_bias = glm::mat4(
@@ -218,21 +192,24 @@ static void render_loop(GLFWwindow *window)
 		context.force_shaders = false;
 		depth_prog->use();
 
-		glViewport(0, 0, 1024, 1024 );
+		glViewport(0, 0, 4096, 4096 );
 		glBindFramebuffer( GL_FRAMEBUFFER, fbuffer );
-		//	glDisable( GL_CULL_FACE );
-		//glCullFace( GL_BACK );
-		glDisable( GL_CULL_FACE );
+		glEnable( GL_CULL_FACE );
+		glCullFace( GL_BACK );
 		glClearColor( 0.1, 0, 0.1, 0.0 );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1.0f, 1.0f);
 		
 
 		//Shadow rendering
 		unicorn.draw(context);
 		tree.draw(context);
 		ground.draw(context);
-		//for ( int i = 0; i < forest.size(); i++ )
-			//forest[i]->draw(context );
+		for ( int i = 0; i < forest.size(); i++ )
+			forest[i]->draw(context );
+
+
 
 
 
@@ -246,13 +223,12 @@ static void render_loop(GLFWwindow *window)
 		prog->use();
 		glViewport(0, 0, renderer::window_width, renderer::window_height );
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		
-
-		
-		
+		//glCullFace( GL_BACK );
 		glDisable( GL_CULL_FACE );
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDisable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset( 0.0, 0 );
 		
 		glActiveTexture( GL_TEXTURE1 );
 		glBindTexture( GL_TEXTURE_2D, depthtex );
@@ -263,8 +239,8 @@ static void render_loop(GLFWwindow *window)
 		unicorn.draw(context);
 		tree.draw(context);
 		ground.draw(context);
-		//for ( int i = 0; i < forest.size(); i++ )
-			//forest[i]->draw(context );
+		for ( int i = 0; i < forest.size(); i++ )
+			forest[i]->draw(context );
 		
 
 		

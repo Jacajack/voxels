@@ -30,9 +30,28 @@ float shadcal( vec4 fragpos )
 {
 	vec3 projCoords = fragpos.xyz / fragpos.w;
 	projCoords = projCoords * 0.5 + 0.5;
+	float bias = 0.005;
 	float closestDepth = texture( shadowMap, projCoords.xy).r;
 	float currentDepth = projCoords.z;
-	float shadow = currentDepth > closestDepth ? 0.0 : 1.0;
+	float shadow = 0;
+
+
+	vec2 texelSize = 1.0 / textureSize( shadowMap, 0 );
+	for ( int x = -2; x <= 2; x++ )
+	{
+		for ( int y = -2; y <= 2; y++ )
+		{
+			float pcfd = texture( shadowMap, projCoords.xy + vec2(x,y) * texelSize).r;
+			shadow += currentDepth - bias > pcfd ? 0 : 1;
+		}
+	}
+
+	shadow /= 25;
+
+
+	if ( projCoords.z > 1 )
+		shadow = 1;
+
 	return shadow;
 }
 
@@ -52,13 +71,11 @@ void main()
 	//vec3 light_world = (mat_view * vec4(light, 1)).xyz;
 
 	//vec3 light_dir = v_pos_world - light_world;
-	//loat theta = dot(normalize(light_dir), normalize(v_normal_camera));
 
 	//Just apply the color from vertex shader
 	color =  model_color * clamp(
-		0.1 +
-		0.1 * cosTheta +
-		0.8 * shadcal(fs_in.FragPosLightSpace)
+		0.8 * cosTheta * shadcal(fs_in.FragPosLightSpace) +
+		0.2 * cosTheta
 
 	, 0, 1);
 	//color = vec3(gl_FragCoord.z);
