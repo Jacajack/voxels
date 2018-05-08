@@ -24,7 +24,7 @@ class ShaderSet
 		bool ready;
 
 	public:
-		std::map <std::string, GLuint> uniforms;
+		std::map <std::string, GLint> uniforms;
 		void use();
 		ShaderSet( std::initializer_list <struct ShaderSpec> shader_specs, std::initializer_list <std::string> uniform_names );
 		~ShaderSet();

@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "shaderset.hpp"
+#include "renderer.hpp"
 
 class Model
 {
@@ -44,7 +45,7 @@ class Model
 		void free_buffers();
 
 	public:
-		virtual void draw();
+		virtual void draw( renderer::RenderContext context );
 		Model(ShaderSet &program, std::string obj_filename, std::string texture_filename);
 		Model(ShaderSet &program, std::string obj_filename, glm::vec3 color);
 		~Model();
@@ -57,7 +58,7 @@ class CompositeModel
 
 	public:
 		CompositeModel(std::initializer_list <Model*> submodels);
-		virtual void draw();
+		virtual void draw( renderer::RenderContext context );
 };
 
 #endif

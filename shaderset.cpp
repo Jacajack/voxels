@@ -54,7 +54,8 @@ int ShaderSet::load_shader( std::string filename, GLenum type )
 	{
 		std::vector <char> mesg(loglength + 1);
 		glGetShaderInfoLog(shader, loglength, NULL, &mesg[0]);
-		std::cerr << ">\t" << &mesg[0] << "\n";
+		std::cerr << "\x1b[31m" << "In file '" << filename << "'\n";
+		std::cerr << &mesg[0] << "\x1b[0m";
 	}
 
 	//Register shader for linking
@@ -107,7 +108,7 @@ ShaderSet::ShaderSet( std::initializer_list <struct ShaderSpec> shader_specs, st
 	{
 		std::vector <char> mesg(loglength + 1);
 		glGetProgramInfoLog(this->program_id, loglength, NULL, &mesg[0]);
-		std::cout << ">\t" << &mesg[0] << "\n";
+		std::cerr << "\x1b[31m" << &mesg[0] << "\x1b[0m";
 	}
 
 	//Mark shaders for deletion
@@ -121,8 +122,12 @@ ShaderSet::ShaderSet( std::initializer_list <struct ShaderSpec> shader_specs, st
 	//Load uniforms
 	glUseProgram( this->program_id );
 	for ( std::string uniform : uniform_names )
+	{
 		this->uniforms[uniform] = glGetUniformLocation( this->program_id, uniform.c_str( ) );
+		std::cerr << (this->uniforms[uniform] == -1 ? "\x1b[31m" : "\x1b[33m") << "Uniform " << uniform << " " << this->uniforms[uniform] << "\x1b[0m\n"; 
+	}
 
+	std::cerr << "-----\n";
 	this->ready = true;
 }
 

@@ -10,6 +10,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include "renderer.hpp"
+
 class Actor : public CompositeModel
 {
 	private:
@@ -20,7 +22,7 @@ class Actor : public CompositeModel
 		glm::vec3 position;
 		glm::vec3 scale;
 
-		void draw( );
+		void draw( renderer::RenderContext context );
 		Actor( std::initializer_list <Model*> submodels );
 
 };

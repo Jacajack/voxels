@@ -7,6 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include "shaderset.hpp"
+
 namespace renderer
 {
 	//All data needed for object rendering
@@ -14,8 +16,11 @@ namespace renderer
 	{
 		glm::mat4 view_matrix;
 		glm::mat4 projection_matrix;
+		glm::mat4 sun_view;
+		glm::mat4 depth_bias;
+		ShaderSet *shaderset = NULL;
 
-		bool enable_shader;
+		bool force_shaders;
 	};
 
 	//State variables

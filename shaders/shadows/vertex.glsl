@@ -7,6 +7,7 @@ layout(location = 2) in vec3 v_normal_model; //Vertex normal (modelspace)
 uniform mat4 mat_model;
 uniform mat4 mat_view;
 uniform mat4 mat_projection;
+uniform mat4 depth_bias;
 
 //UV map output
 out vec2 v_uv_o;
@@ -22,6 +23,12 @@ uniform mat4 sun_view;
 
 out vec3 v_pos_sun;
 
+
+out VS_OUT {
+    vec3 FragPos;
+    vec4 FragPosLightSpace;
+} vs_out;
+
 void main( )
 {
 	//Camera transformation
@@ -36,15 +43,25 @@ void main( )
 	//Position on screen	
 	gl_Position = mat_projection * vec4(v_pos_camera, 1);
 
-	v_pos_sun = (sun_view * mat_model * vec4(v_pos_model, 1)).xyz;
+	//Sun
+	//gl_Position = sun_view *  mat_model  * vec4(v_pos_model, 1);
+
+	//v_pos_sun = (sun_view * mat_model * vec4(v_pos_model, 1)).xyz;
 
 	//From vertex to camera
 	v_eye_camera = vec3(0, 0, 0) - v_pos_camera;
 	v_normal_camera = (mat_view * mat_model * vec4(v_normal_model, 0)).xyz;
 
 
+
+	//shadow =  /*depth_bias * */sun_view *  mat_model  * vec4(v_pos_model, 1);
+
 	//Just pass on the color to the fragment shader
 	v_uv_o = v_uv;
 
 	
+
+	vs_out.FragPos = vec3(mat_model * vec4(v_pos_model, 1.0));	
+    vs_out.FragPosLightSpace = sun_view * vec4(vs_out.FragPos, 1.0);
+
 }

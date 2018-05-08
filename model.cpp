@@ -11,6 +11,7 @@
 #include <GL/glew.h>
 
 #include "shaderset.hpp"
+#include "renderer.hpp"
 
 //This is awfully slow because... guess what...
 //It uses regex!
@@ -380,20 +381,28 @@ void Model::free_buffers()
 }
 
 //Just draw the model
-void Model::draw()
+void Model::draw( renderer::RenderContext context )
 {
 	if (!this->buffers_loaded) return;
 	
-	this->shaderset.use( );
+	ShaderSet *shaders = context.force_shaders ? &this->shaderset : context.shaderset;
 
-	glUniform4fv( this->shaderset.uniforms["model_tint"], 1, &this->tint[0] );
+	shaders->use( );
+
+	glUniform4fv( shaders->uniforms["model_tint"], 1, &this->tint[0] );
+	glUniformMatrix4fv( shaders->uniforms["mat_view"], 1, GL_FALSE, &context.view_matrix[0][0]);
+	glUniformMatrix4fv( shaders->uniforms["mat_projection"], 1, GL_FALSE, &context.projection_matrix[0][0]);
+	glUniformMatrix4fv( shaders->uniforms["sun_view"], 1, GL_FALSE, &context.sun_view[0][0]);
+	glUniformMatrix4fv( shaders->uniforms["depth_bias"], 1, GL_FALSE, &context.depth_bias[0][0]);
+	//glUniformMatrix4fv( shaderset->uniforms["depth_bias"], 1, GL_FALSE, &context.depth_bias[0][0]);
+
 
 	//Activate texturing unit
 	if ( this->texture_loaded )
 	{
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, this->texture_id);
-		glUniform1i(this->shaderset.uniforms["texture_sampler"], 0);
+		glUniform1i(shaders->uniforms["texture_sampler"], 0);
 	}
 
 	glEnableVertexAttribArray(0); //Vertex data
@@ -451,9 +460,9 @@ Model::Model(ShaderSet &shader_program, std::string obj_filename, std::string te
 	this->texture_loaded = false;
 	this->tint = glm::vec4(0.0);
 
-	if ( !this->load_obj(obj_filename, true) )
+	if ( !this->load_obj(obj_filename, false) )
 	{
-		if ( !this->load_texture( texture_filename, true ) )
+		if ( !this->load_texture( texture_filename, false) )
 		{
 			this->init_buffers();
 		}
@@ -468,7 +477,7 @@ Model::Model(ShaderSet &shader_program, std::string obj_filename, glm::vec3 colo
 	this->texture_loaded = false;
 	this->tint = glm::vec4(color, 1.0);
 
-	if ( !this->load_obj(obj_filename, true) )
+	if ( !this->load_obj(obj_filename, false) )
 	{
 		this->init_buffers();
 	}
@@ -482,10 +491,10 @@ Model::~Model()
 }
 
 //Composite model draw routine
-void CompositeModel::draw( )
+void CompositeModel::draw( renderer::RenderContext context )
 {
 	for ( Model *model : this->submodels )
-		model->draw( );
+		model->draw( context );
 }
 
 
