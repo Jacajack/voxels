@@ -9,6 +9,15 @@
 
 namespace renderer
 {
+	//All data needed for object rendering
+	struct RenderContext
+	{
+		glm::mat4 view_matrix;
+		glm::mat4 projection_matrix;
+
+		bool enable_shader;
+	};
+
 	//State variables
 	extern bool ready;
 	extern bool active;

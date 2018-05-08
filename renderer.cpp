@@ -44,7 +44,6 @@ void (*renderer::on_render_callback)() = nullptr;
 static bool render_lock_rq = false, render_lock_ack = false;
 static void render_loop(GLFWwindow *window)
 {
-	glm::mat4 locked_view_matrix;
 	glm::mat4 camera_matrix;
 	glm::mat4 model_matrix;
 
@@ -54,12 +53,13 @@ static void render_loop(GLFWwindow *window)
 		"mat_view",
 		"mat_projection",
 		"texture_sampler",
-		"model_tint"
+		"model_tint",
+		"sun_view",
 	};
 	ShaderSet *prog = new ShaderSet(
 		{
-			{"shaders/fake-depth/vertex.glsl", GL_VERTEX_SHADER},
-			{"shaders/fake-depth/fragment.glsl", GL_FRAGMENT_SHADER}
+			{"shaders/shadows/vertex.glsl", GL_VERTEX_SHADER},
+			{"shaders/shadows/fragment.glsl", GL_FRAGMENT_SHADER}
 		}, 
 		shared_uniforms
 	);
@@ -73,7 +73,7 @@ static void render_loop(GLFWwindow *window)
 		}
 	);
 	unicorn.rotation = glm::vec3(M_PI_2, M_PI, M_PI_2 );
-	unicorn.position.y = 2;
+	unicorn.position.y = 2.5;
 	unicorn.position.x = -5;
 
 	Actor tree(
@@ -83,6 +83,12 @@ static void render_loop(GLFWwindow *window)
 		}
 	);
 	tree.rotation.y = M_PI;
+
+	Actor ground(
+		{
+			new Model( *prog, "models/ground.obj", glm::vec3( 1, 1, 1 ) ),
+		}
+	);
 
 	std::vector <Actor*> forest;
 	for ( int i = 0; i < 64; i++ )
@@ -112,12 +118,17 @@ static void render_loop(GLFWwindow *window)
 	GLuint glsl_model_matrix_id = prog->uniforms["mat_model"]; //glGetUniformLocation(program_id, "mat_model");
 	GLuint glsl_view_matrix_id = prog->uniforms["mat_view"]; //glGetUniformLocation(program_id, "mat_view");
 	GLuint glsl_projection_matrix_id = prog->uniforms["mat_projection"]; //glGetUniformLocation(program_id, "mat_projection");
+	GLuint sun = prog->uniforms["sun_view"];
+
+	renderer::RenderContext context;
+	
+
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	//Use default shaders
 	//glUseProgram(program_id);
-	prog->use( );
+	//prog->use( );
 
 	//Render loop
 	while (renderer::active && glfwWindowShouldClose(window) == 0)
@@ -128,7 +139,7 @@ static void render_loop(GLFWwindow *window)
 		render_lock_ack = false;
 
 		//This has to be locked during rendering otherwise blinking may appear
-		locked_view_matrix = renderer::view_matrix;
+		context.view_matrix = renderer::view_matrix;
 
 		//Update mouse pos
 		glfwGetCursorPos(renderer::window, &renderer::mouse_x, &renderer::mouse_y);
@@ -138,8 +149,16 @@ static void render_loop(GLFWwindow *window)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Apply view and projection matrices
-		glUniformMatrix4fv(glsl_view_matrix_id, 1, GL_FALSE, &locked_view_matrix[0][0]);
+		glUniformMatrix4fv(glsl_view_matrix_id, 1, GL_FALSE, &context.view_matrix[0][0]);
 		glUniformMatrix4fv(glsl_projection_matrix_id, 1, GL_FALSE, &renderer::projection_matrix[0][0]);
+
+		glm::mat4 sun_view = /* glm::ortho <float> (-10, 10, -10, 10, -10, 20 ) * */ glm::lookAt( 
+			glm::vec3( 10, 10, 0 ),
+			glm::vec3( 0, 0, 0 ),
+			glm::vec3( 0, 1, 0 )
+		);
+		glUniformMatrix4fv(sun, 1, GL_FALSE, &sun_view[0][0]);
+
 
 
 		//Render whole map
@@ -155,6 +174,7 @@ static void render_loop(GLFWwindow *window)
 		//monkey.draw();
 		unicorn.draw();
 		tree.draw();
+		ground.draw( );
 
 		for ( int i = 0; i < forest.size(); i++ )
 			forest[i]->draw( );
