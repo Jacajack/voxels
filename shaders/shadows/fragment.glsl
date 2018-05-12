@@ -22,37 +22,80 @@ in vec4 shadow;
 
 in VS_OUT {
     vec3 FragPos;
+	vec3 normalLightSpace;
     vec4 FragPosLightSpace;
 } fs_in;
 
+float linstep( float low, float high, float v )
+{
+	return clamp( ( v - low ) / ( high - low ), 0, 1 );
+}
 
-float shadcal( vec4 fragpos )
+float shadcal( vec4 fragpos, vec3 normal )
 {
 	vec3 projCoords = fragpos.xyz / fragpos.w;
 	projCoords = projCoords * 0.5 + 0.5;
+
+	vec2 moments = texture2D( shadowMap, projCoords.xy).rg;
+	float currentDepth = projCoords.z;
+	
+	//return moments.x;//currentDepth -moments.x > 0 ? 0.5 : 0;// ? 0 : 1;
+
+	float p = step( currentDepth, moments.x );
+	float variance = max( moments.y - moments.x * moments.x, 0.00008 );
+	float d = currentDepth - moments.x;
+	float pMax = linstep( 0.1, 1.0, variance / (variance + d*d) );
+
+	//return moments.y;
+	return min(max(p, pMax), 1.0);
+	//return p;
+
+/*
+
 	float bias = 0.005;
+
+	//fragpos - in sun space
+	//normal - in sun space
+	//vec3 fragsun = (vec4(0,0,0,0) - fragpos).xyz;
+	//float cosTheta = clamp(dot(normalize(normal), normalize(fragsun)), 0, 1);
+
+	//return cosTheta;
+
+	//float bias = 0.005*tan(acos(cosTheta));
+	//bias = clamp(bias, 0,0.1);
+	
+	
 	float closestDepth = texture( shadowMap, projCoords.xy).r;
 	float currentDepth = projCoords.z;
 	float shadow = 0;
-
-
+*/
+/*
 	vec2 texelSize = 1.0 / textureSize( shadowMap, 0 );
-	for ( int x = -2; x <= 2; x++ )
+	for ( int x = -1; x <= 1; x++ )
 	{
-		for ( int y = -2; y <= 2; y++ )
+		for ( int y = -1; y <= 1; y++ )
 		{
 			float pcfd = texture( shadowMap, projCoords.xy + vec2(x,y) * texelSize).r;
 			shadow += currentDepth - bias > pcfd ? 0 : 1;
 		}
 	}
 
-	shadow /= 25;
 
-
+	shadow /= 9;
+*/
+/*
+	float tex  = texture( shadowMap, projCoords.xy ).r;
+	//return tex;
+	
+	
+	shadow = currentDepth - bias > tex ? 0 : 1;
+*/
+/*
 	if ( projCoords.z > 1 )
 		shadow = 1;
 
 	return shadow;
+*/
 }
 
 void main()
@@ -74,9 +117,8 @@ void main()
 
 	//Just apply the color from vertex shader
 	color =  model_color * clamp(
-		0.8 * cosTheta * shadcal(fs_in.FragPosLightSpace) +
-		0.2 * cosTheta
-
+		0.8 *  shadcal(fs_in.FragPosLightSpace, fs_in.normalLightSpace) 
+		+ 0.2 * cosTheta
 	, 0, 1);
 	//color = vec3(gl_FragCoord.z);
 	//float d = texture( shadowMap, )

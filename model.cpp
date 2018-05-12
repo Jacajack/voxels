@@ -448,8 +448,11 @@ void Model::draw( renderer::RenderContext context )
 	glDisableVertexAttribArray(1); //UV
 	glDisableVertexAttribArray(2); //Normals
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_TEXTURE_2D);
+	if ( this->texture_loaded )
+	{
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glDisable(GL_TEXTURE_2D);
+	}
 }
 
 //Loader constructor

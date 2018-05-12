@@ -10,9 +10,14 @@ uniform mat4 sun_view;
 
 in vec3 v_pos_sun;
 
+out vec2 color;
+
 void main()
 {
-	//fragmentdepth = gl_FragCoord.z;
-	//gl_FragDepth = //0.20;//1;//gl_FragCoord.z;
-	//color = vec3(0, 1,0);
+	float depth = gl_FragCoord.z;
+	float dx = dFdx(depth);
+	float dy = dFdy(depth);
+	float moment2 = depth * depth  + 0.5 * ( dx * dx + dy * dy );
+
+	color = vec2( depth, moment2 );;
 }

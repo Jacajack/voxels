@@ -87,11 +87,11 @@ static void render_loop(GLFWwindow *window)
 	
 	Actor unicorn(
 		{
-			new Model(*prog, "models/uni.obj", "models/uni.png")
+			new Model(*prog, "models/cyl.obj", /* "models/uni.png" */  glm::vec3(1.0, 0.5, 0.7) )
 		}
 	);
-	unicorn.rotation = glm::vec3(M_PI_2, M_PI, M_PI_2 );
-	unicorn.position.y = 2.5;
+	//unicorn.rotation = glm::vec3(M_PI_2, M_PI, M_PI_2 );
+	//unicorn.position.y = 2.5;
 	unicorn.position.x = 10;
 	unicorn.scale = glm::vec3(1);
 
@@ -129,24 +129,41 @@ static void render_loop(GLFWwindow *window)
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	//Shadow buffer
+	
+
 	GLuint fbuffer;
 	glGenFramebuffers(1, &fbuffer);	
 	GLuint depthtex;
 	glGenTextures( 1, &depthtex );
 	glBindTexture( GL_TEXTURE_2D, depthtex );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 4096, 4096, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RG32F, 4096, 4096, 0, GL_RG, GL_FLOAT, 0 );
+	//glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 2048, 2048, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->texture_width, this->texture_height, 0, this->texture_format, GL_UNSIGNED_BYTE, this->texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	float border_color[] = {1, 1, 1, 1};
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
 
 	glBindFramebuffer( GL_FRAMEBUFFER, fbuffer );	
 	glBindTexture( GL_TEXTURE_2D, depthtex );
-	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthtex, 0 );
-	glDrawBuffer( GL_NONE );
-	glReadBuffer( GL_NONE );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, depthtex, 0 );
+
+
+	GLuint rendbuf;
+	glGenRenderbuffers(1, &rendbuf);
+	glBindRenderbuffer( GL_RENDERBUFFER, rendbuf );
+	glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 4096, 4096 );
+	glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rendbuf );
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	//glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthtex, 0 );
+	//glDrawBuffer( GL_NONE );
+	//glReadBuffer( GL_NONE );
 
 
 	//Render loop
@@ -163,11 +180,11 @@ static void render_loop(GLFWwindow *window)
 		//context.sun_view = /*glm::ortho <float> (-20, 20, -20, 20, -20, 20 ) * */  
 		/*glm::perspective( glm::radians( 90.0 ), 1.0, 0.1, 100.0 );*/
 
-		glm::vec3 sun_p = renderer::sun_pos;;
+		glm::vec3 sun_p = renderer::sun_pos;
 		glm::vec3 sun_d = renderer::sun_dir;
 
 		context.sun_view =
-		glm::ortho <float> (-20, 20, -20, 20, 1, 30 ) * 
+		glm::ortho <float> (-20, 20, -20, 20, 1, 50 ) * 
 		glm::lookAt( 
 			sun_p,
 			sun_p + sun_d,
@@ -193,14 +210,21 @@ static void render_loop(GLFWwindow *window)
 		depth_prog->use();
 
 		glViewport(0, 0, 4096, 4096 );
-		glBindFramebuffer( GL_FRAMEBUFFER, fbuffer );
-		glEnable( GL_CULL_FACE );
-		glCullFace( GL_BACK );
-		glClearColor( 0.1, 0, 0.1, 0.0 );
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0f, 1.0f);
 		
+		glBindFramebuffer( GL_FRAMEBUFFER, fbuffer );
+
+		//glViewport(0, 0, renderer::window_width, renderer::window_height );
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//glEnable( GL_CULL_FACE );
+		//glCullFace( GL_BACK );
+		glClearColor( 0.0, 0, 0.0, 0.0 );
+		glClearDepth( 1.0f );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+		//glEnable(GL_POLYGON_OFFSET_FILL);
+		//glPolygonOffset(1.0f, 1.0f);
+		
+		glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 		//Shadow rendering
 		unicorn.draw(context);
@@ -213,7 +237,7 @@ static void render_loop(GLFWwindow *window)
 
 
 
-
+///*
 
 
 		
@@ -227,8 +251,8 @@ static void render_loop(GLFWwindow *window)
 		glDisable( GL_CULL_FACE );
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glDisable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset( 0.0, 0 );
+		//glDisable(GL_POLYGON_OFFSET_FILL);
+		//glPolygonOffset( 0.0, 0 );
 		
 		glActiveTexture( GL_TEXTURE1 );
 		glBindTexture( GL_TEXTURE_2D, depthtex );
@@ -243,7 +267,7 @@ static void render_loop(GLFWwindow *window)
 			forest[i]->draw(context );
 		
 
-		
+//*/		
 
 
 		

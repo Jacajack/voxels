@@ -26,6 +26,7 @@ out vec3 v_pos_sun;
 
 out VS_OUT {
     vec3 FragPos;
+	vec3 normalLightSpace;
     vec4 FragPosLightSpace;
 } vs_out;
 
@@ -55,6 +56,8 @@ void main( )
 
 
 	vs_out.FragPos = vec3(mat_model * vec4(v_pos_model, 1.0));	
+	vs_out.normalLightSpace = (sun_view * mat_model * vec4(v_normal_model, 0)).xyz;
     vs_out.FragPosLightSpace = sun_view * vec4(vs_out.FragPos, 1.0);
+
 
 }
