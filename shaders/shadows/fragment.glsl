@@ -42,9 +42,9 @@ float shadcal( vec4 fragpos, vec3 normal )
 	//return moments.x;//currentDepth -moments.x > 0 ? 0.5 : 0;// ? 0 : 1;
 
 	float p = step( currentDepth, moments.x );
-	float variance = max( moments.y - moments.x * moments.x, 0.00008 );
+	float variance = max( moments.y - moments.x * moments.x, 0.0001 );
 	float d = currentDepth - moments.x;
-	float pMax = linstep( 0.1, 1.0, variance / (variance + d*d) );
+	float pMax = linstep( 0.2, 1.0, variance / (variance + d*d) );
 
 	//return moments.y;
 	return min(max(p, pMax), 1.0);

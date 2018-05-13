@@ -87,11 +87,11 @@ static void render_loop(GLFWwindow *window)
 	
 	Actor unicorn(
 		{
-			new Model(*prog, "models/cyl.obj", /* "models/uni.png" */  glm::vec3(1.0, 0.5, 0.7) )
+			new Model(*prog, "models/uni.obj", /* "models/uni.png" */  glm::vec3(1.0, 0.5, 0.7) )
 		}
 	);
-	//unicorn.rotation = glm::vec3(M_PI_2, M_PI, M_PI_2 );
-	//unicorn.position.y = 2.5;
+	unicorn.rotation = glm::vec3(M_PI_2, M_PI, M_PI_2 );
+	unicorn.position.y = 2.5;
 	unicorn.position.x = 10;
 	unicorn.scale = glm::vec3(1);
 
