@@ -184,7 +184,7 @@ static void render_loop(GLFWwindow *window)
 		glm::vec3 sun_d = renderer::sun_dir;
 
 		context.sun_view =
-		glm::ortho <float> (-20, 20, -20, 20, 1, 50 ) * 
+		glm::ortho <float> (-30, 30, -30, 30, 1, 50 ) * 
 		glm::lookAt( 
 			sun_p,
 			sun_p + sun_d,

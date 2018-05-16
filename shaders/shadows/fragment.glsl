@@ -41,61 +41,25 @@ float shadcal( vec4 fragpos, vec3 normal )
 	
 	//return moments.x;//currentDepth -moments.x > 0 ? 0.5 : 0;// ? 0 : 1;
 
+
+	vec3 norm2 = vec3(0, 0, -1);// - fragpos.xyz;
+	float ctheta =  dot( normalize( norm2), normalize(normal) );
+	//ctheta = ctheta > 0 ? 1 : 1 + ctheta;
+	//ctheta = 1 - ctheta;
+	//ctheta = clamp( ctheta, 0, 1 );
+
+
 	float p = step( currentDepth, moments.x );
 	float variance = max( moments.y - moments.x * moments.x, 0.0001 );
 	float d = currentDepth - moments.x;
 	float pMax = linstep( 0.2, 1.0, variance / (variance + d*d) );
 
 	//return moments.y;
-	return min(max(p, pMax), 1.0);
+	//return min(max(p, pMax), 1.0) * clamp((1-ctheta),0,1);
 	//return p;
+	return ctheta * min(max(p, pMax), 1.0);//clamp(ctheta,0,1);
 
-/*
-
-	float bias = 0.005;
-
-	//fragpos - in sun space
-	//normal - in sun space
-	//vec3 fragsun = (vec4(0,0,0,0) - fragpos).xyz;
-	//float cosTheta = clamp(dot(normalize(normal), normalize(fragsun)), 0, 1);
-
-	//return cosTheta;
-
-	//float bias = 0.005*tan(acos(cosTheta));
-	//bias = clamp(bias, 0,0.1);
-	
-	
-	float closestDepth = texture( shadowMap, projCoords.xy).r;
-	float currentDepth = projCoords.z;
-	float shadow = 0;
-*/
-/*
-	vec2 texelSize = 1.0 / textureSize( shadowMap, 0 );
-	for ( int x = -1; x <= 1; x++ )
-	{
-		for ( int y = -1; y <= 1; y++ )
-		{
-			float pcfd = texture( shadowMap, projCoords.xy + vec2(x,y) * texelSize).r;
-			shadow += currentDepth - bias > pcfd ? 0 : 1;
-		}
-	}
-
-
-	shadow /= 9;
-*/
-/*
-	float tex  = texture( shadowMap, projCoords.xy ).r;
-	//return tex;
-	
-	
-	shadow = currentDepth - bias > tex ? 0 : 1;
-*/
-/*
-	if ( projCoords.z > 1 )
-		shadow = 1;
-
-	return shadow;
-*/
+	//return ctheta;
 }
 
 void main()
@@ -117,8 +81,8 @@ void main()
 
 	//Just apply the color from vertex shader
 	color =  model_color * clamp(
-		0.8 *  shadcal(fs_in.FragPosLightSpace, fs_in.normalLightSpace) 
-		+ 0.2 * cosTheta
+		1 *  shadcal(fs_in.FragPosLightSpace, fs_in.normalLightSpace) 
+		//+ 0.2 * cosTheta
 	, 0, 1);
 	//color = vec3(gl_FragCoord.z);
 	//float d = texture( shadowMap, )
