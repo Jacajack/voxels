@@ -112,13 +112,14 @@ static void render_loop(GLFWwindow *window)
 
 
 	std::vector <Actor*> forest;
-	for ( int i = 0; i < 15; i++ )
+	for ( int i = 0; i < 64; i++ )
 	{
 		Actor *t = new Actor( tree );
 
 		t->position.x = (rand() % 1000 / 1000.0) * 100.0 - 50;
 		t->position.z = (rand() % 1000 / 1000.0) * 100.0 - 50;
 		t->rotation.y = (rand() % 1000 / 1000.0) * 2 * M_PI;
+		t->scale = glm::vec3(0.8 + 0.4 * (rand() % 1000 / 1000.0) );
 
 		forest.push_back(t);
 		//t->position = glm::vec3( 5, 0, 0);
