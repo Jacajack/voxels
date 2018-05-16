@@ -46,7 +46,7 @@ float shadcal( vec4 fragpos, vec3 normal )
 	float ctheta =  dot( normalize( norm2), normalize(normal) );
 	//ctheta = ctheta > 0 ? 1 : 1 + ctheta;
 	//ctheta = 1 - ctheta;
-	//ctheta = clamp( ctheta, 0, 1 );
+	ctheta = clamp( ctheta, 0, 1 );
 
 
 	float p = step( currentDepth, moments.x );
