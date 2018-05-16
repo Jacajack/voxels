@@ -81,8 +81,8 @@ void main()
 
 	//Just apply the color from vertex shader
 	color =  model_color * clamp(
-		1 *  shadcal(fs_in.FragPosLightSpace, fs_in.normalLightSpace) 
-		//+ 0.2 * cosTheta
+		0.8 *  shadcal(fs_in.FragPosLightSpace, fs_in.normalLightSpace) 
+		+ 0.2 * cosTheta
 	, 0, 1);
 	//color = vec3(gl_FragCoord.z);
 	//float d = texture( shadowMap, )
