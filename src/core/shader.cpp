@@ -29,10 +29,24 @@ static int slurp_file( std::string &str, std::string filename )
 	return 0;
 }
 
+//Uniform getter
+inline GLuint ifrit::Shader::uniform( std::string name )
+{
+	return this->uniforms[name];
+}
+
+//Use program
+inline void ifrit::Shader::use( )
+{
+	glUseProgram( this->program_id );
+}
 
 //Shader set constructor
 ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::initializer_list <std::string> uniform_names )
 {
+	//Shader is not ready by default
+	this->ready = false;
+
 	//Temporary vector for shader handles
 	std::vector <GLuint> shaders;
 
@@ -109,4 +123,13 @@ ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::ini
 		this->uniforms[uniform] = glGetUniformLocation( this->program_id, uniform.c_str( ) );
 		ifrit::log( IFRIT_DEBUG, "uniform '%s' at %ld", uniform.c_str( ), (long) this->uniforms[uniform] );
 	}
+
+	//Shader loaded
+	this->ready = true;
+}
+
+//Shader destructor
+ifrit::Shader::~Shader( )
+{
+	if ( this->ready ) glDeleteProgram( this->program_id );
 }

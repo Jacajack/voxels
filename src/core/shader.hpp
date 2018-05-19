@@ -25,11 +25,16 @@ namespace ifrit
 		private:
 			GLuint program_id;
 			std::map <std::string, GLuint> uniforms;
+			bool ready;
 
 		public:
+			//Utilities
+			inline void use( );
+			inline GLuint uniform( std::string name );
+
+			//Constructor and destructor
 			Shader( std::initializer_list <struct ShaderSpec> specs, std::initializer_list <std::string> uniform_names );
 			~Shader( );
-
 	};
 };
 
