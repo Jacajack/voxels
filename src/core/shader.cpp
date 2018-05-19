@@ -53,6 +53,9 @@ ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::ini
 	//Load all shaders
 	for ( struct ifrit::ShaderSpec spec : specs )
 	{
+		//Log
+		ifrit::log( IFRIT_INFO, "loading shader file '%s'", spec.filename.c_str( ) );
+
 		//Shader source code
 		std::string src;
 		const char *csrc;
