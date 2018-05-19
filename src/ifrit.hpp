@@ -9,17 +9,25 @@
 namespace ifrit
 {
 	//Window data
-	struct
+	extern struct WindowInformation
 	{
-		GLFWwindow *win;
+		GLFWwindow *window;
 		int resx, resy;
 		std::string title;
-	} window;
+	} win;
+
+	//Status data
+	extern struct CoreStatus
+	{
+		bool active;
+	} status;
+
+	//Renderer and updater function
+	extern void update( );
 
 	//Init and destroy functions
-	int init( int resx, int resy, std::string title );
-	void destroy( );
-
+	extern int init( int resx, int resy, std::string title );
+	extern void destroy( );
 };
 
 #endif

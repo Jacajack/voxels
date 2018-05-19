@@ -4,6 +4,22 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+//Ifrit structs
+struct ifrit::WindowInformation ifrit::win;
+struct ifrit::CoreStatus ifrit::status;
+
+//The renderer
+void ifrit::update( )
+{
+	if ( ifrit::status.active == false ) return;
+
+
+	//Update buffers and poll events
+	glfwSwapBuffers( ifrit::win.window );
+	glfwPollEvents( );
+	ifrit::status.active = !glfwWindowShouldClose( ifrit::win.window );
+}
+
 //3D engine init routine
 int ifrit::init( int resx, int resy, std::string title )
 {
@@ -23,17 +39,17 @@ int ifrit::init( int resx, int resy, std::string title )
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
 	//Create the window
-	ifrit::window.resx = resx;
-	ifrit::window.resy = resy;
-	ifrit::window.title = title;
-	ifrit::window.win = glfwCreateWindow( ifrit::window.resx, ifrit::window.resy, ifrit::window.title.c_str( ), NULL, NULL );
-	if ( ifrit::window.win == NULL )
+	ifrit::win.resx = resx;
+	ifrit::win.resy = resy;
+	ifrit::win.title = title;
+	ifrit::win.window = glfwCreateWindow( ifrit::win.resx, ifrit::win.resy, ifrit::win.title.c_str( ), NULL, NULL );
+	if ( ifrit::win.window == NULL )
 	{
 		std::cerr << "ifrit: Window creation failed\n";
 		glfwTerminate( );
 		return 1;
 	}
-	glfwMakeContextCurrent( ifrit::window.win );
+	glfwMakeContextCurrent( ifrit::win.window );
 
 	//GLEW init
 	glewExperimental = true;
@@ -43,6 +59,12 @@ int ifrit::init( int resx, int resy, std::string title )
 		glfwTerminate( );
 		return 1;
 	}
+
+	//Input modes
+	glfwSetInputMode( ifrit::win.window, GLFW_STICKY_KEYS, GL_TRUE );
+
+	//Consider Ifrit running
+	ifrit::status.active = true;
 
 	return 0;
 };

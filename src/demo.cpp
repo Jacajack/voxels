@@ -3,10 +3,18 @@
 
 
 int main( int argc, char **argv )
-{	std::cout << "Hello world!\n";
+{	
+	//Create window
+	if ( ifrit::init( 1024, 768, "Ifrit dev" ) ) return 1;
 	
-	ifrit::init( 1024, 768, "Ifrit dev" );
-	while ( 1 );
+	//Game loop
+	do
+	{
+		ifrit::update( );
+	}
+	while ( ifrit::status.active == true );
+	
+	//Destroy
 	ifrit::destroy( );
 
 	return 0;
