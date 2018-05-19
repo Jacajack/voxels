@@ -180,7 +180,50 @@ void ifrit::Model::free_buffers( )
 //Basic render function
 void ifrit::Model::draw( )
 {
-	
+	if ( !this->buffers_loaded ) load_buffers( );
+
+	glEnableVertexAttribArray( 0 ); //Vertex data
+	glEnableVertexAttribArray( 1 ); //UVs
+	glEnableVertexAttribArray( 2 ); //Normals
+
+	//Attribute 0 - vertex position
+	glBindBuffer( GL_ARRAY_BUFFER, this->vertex_buffer_id );
+	glVertexAttribPointer(
+		0, //Attribute ID
+		3, //Size
+		GL_FLOAT, //Type
+		GL_FALSE, //Normalized
+		0, //Stride
+		NULL //Array buffer offset
+	);
+
+	//Attribute 1 - UV
+	glBindBuffer( GL_ARRAY_BUFFER, this->uv_buffer_id );
+	glVertexAttribPointer(
+		1, //Attribute ID
+		2, //Size
+		GL_FLOAT, //Type
+		GL_FALSE, //Normalized
+		0, //Stride
+		NULL //Array buffer offset
+	);
+
+	//Attribute 2 - Normals
+	glBindBuffer( GL_ARRAY_BUFFER, this->normal_buffer_id );
+	glVertexAttribPointer(
+		2, //Attribute ID
+		3, //Size
+		GL_FLOAT, //Type
+		GL_FALSE, //Normalized
+		0, //Stride
+		NULL //Array buffer offset
+	);
+
+	glDrawArrays( GL_TRIANGLES, 0, this->vertices.size( ) );
+
+	glDisableVertexAttribArray( 0 ); //Vertex data
+	glDisableVertexAttribArray( 1 ); //UV
+	glDisableVertexAttribArray( 2 ); //Normals
 }
 
 //Model constructor loading data from file
