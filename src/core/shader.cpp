@@ -30,13 +30,13 @@ static int slurp_file( std::string &str, std::string filename )
 }
 
 //Uniform getter
-inline GLuint ifrit::Shader::uniform( std::string name )
+GLuint ifrit::Shader::uniform( std::string name )
 {
 	return this->uniforms[name];
 }
 
 //Use program
-inline void ifrit::Shader::use( )
+void ifrit::Shader::use( )
 {
 	glUseProgram( this->program_id );
 }
