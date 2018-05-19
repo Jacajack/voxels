@@ -1,0 +1,1 @@
+g++ libglew-dev libglfw3-dev libglm-dev libpng-dev
