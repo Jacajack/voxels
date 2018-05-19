@@ -15,8 +15,11 @@ namespace ifrit
 		protected:
 			//Model data
 			std::vector <glm::vec3> vertices;
+			GLuint vertex_buffer_id;
 			std::vector <glm::vec3> normals;
+			GLuint normal_buffer_id;
 			std::vector <glm::vec2> uvs;
+			GLuint uv_buffer_id;
 			bool buffers_loaded;
 
 			//Wavefront file loader

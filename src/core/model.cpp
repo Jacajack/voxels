@@ -56,7 +56,7 @@ void ifrit::Model::load_obj_file( std::string filename )
 			}
 			else if ( token_type == "f" ) //Face data
 			{
-				//ID's
+				//IDs
 				unsigned int ids[9];
 
 				//How far gone are we?
@@ -150,13 +150,37 @@ void ifrit::Model::load_buffers( )
 //Free OpenGL buffers while preserving data in vectors
 void ifrit::Model::free_buffers( )
 {
+	if ( !this->buffers_loaded ) return;
 
+	glDeleteBuffers( 1, &this->vertex_buffer_id );
+	glDeleteBuffers( 1, &this->uv_buffer_id );
+	glDeleteBuffers( 1, &this->normal_buffer_id );
+
+
+	this->buffers_loaded = false;
 }
 
 //Basic render function
 void ifrit::Model::draw( )
 {
+	if ( this->buffers_loaded ) return;
 
+	//Create and load vertex buffer
+	glGenBuffers( 1, &this->vertex_buffer_id );
+	glBindBuffer( GL_ARRAY_BUFFER, this->vertex_buffer_id );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( this->vertices[0] ) * this->vertices.size( ), &this->vertices[0], GL_STATIC_DRAW );
+
+	//Create and load UV buffer
+	glGenBuffers( 1, &this->uv_buffer_id );
+	glBindBuffer( GL_ARRAY_BUFFER, this->uv_buffer_id );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( this->uvs[0] ) * this->uvs.size( ), &this->uvs[0], GL_STATIC_DRAW );
+
+	//Create and load normal buffer
+	glGenBuffers( 1, &this->normal_buffer_id );
+	glBindBuffer( GL_ARRAY_BUFFER, this->normal_buffer_id );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( this->normals[0] ) * this->normals.size( ), &this->normals[0], GL_STATIC_DRAW );
+
+	this->buffers_loaded = true;
 }
 
 //Model constructor loading data from file
