@@ -1,12 +1,57 @@
 #include "ifrit.hpp"
 #include <iostream>
 #include <string>
+#include <stdarg.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+//Ifrit includes
+#include "core/shader.hpp"
 
 //Ifrit structs
 struct ifrit::WindowInformation ifrit::win;
 struct ifrit::CoreStatus ifrit::status;
+
+//Logger function
+void __attribute__( ( format ( printf, 2, 3 ) ) ) ifrit::log( int level, const char *format, ... )
+{
+	//Select color
+	switch ( level )
+	{
+		case IFRIT_NOTICE:
+			std::printf( "ifrit: \x1b[37m" );
+			break;
+
+		case IFRIT_WARN:
+			std::printf( "ifrit: \x1b[33m" );
+			break;
+
+		case IFRIT_DEBUG:
+			std::printf( "ifrit_dbg: \x1b[32m" );
+			break;
+
+		case IFRIT_ERROR:
+		default:
+			std::printf( "ifrit: \x1b[31m" );
+			break;
+	}
+
+	//Print the message
+	va_list ap;
+	va_start( ap, format );
+	std::vprintf( format, ap );
+	va_end( ap );
+	std::printf( "\x1b[0m\n" );
+}
+
+//Log function wrapper
+void __attribute__( ( format ( printf, 1, 2 ) ) ) ifrit::log( const char *format, ... )
+{
+	va_list ap;
+	va_start( ap, format );
+	ifrit::log( IFRIT_NOTICE, format, ap );
+	va_end( ap );
+}
 
 //The renderer
 void ifrit::update( )
@@ -26,7 +71,8 @@ int ifrit::init( int resx, int resy, std::string title )
 	//GLFW init
 	if ( !glfwInit( ) )
 	{
-		std::cerr << "ifirt: GLFW init failed\n";
+		ifrit::log( IFRIT_ERROR, "GLFW init failed" );
+		//std::cerr << "ifirt: GLFW init failed\n";
 		return 1;
 	}
 
