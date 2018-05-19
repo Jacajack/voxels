@@ -25,10 +25,12 @@ void ifrit::Model::load_obj_file( std::string filename )
 	{
 		//Read file line by line
 		std::string line;
+		int linecnt = 1;
+
 		while ( std::getline( objfile, line ) )
 		{
 			//Skip comments
-			if ( line[0] == ' ' ) continue;
+			if ( line[0] == '#' ) continue;
 
 			//Find first space and split line into token type and data
 			size_t sep = line.find( " " );
@@ -93,9 +95,10 @@ void ifrit::Model::load_obj_file( std::string filename )
 			}
 			else
 			{
-				ifrit::log( IFRIT_ERROR, "unhandled token type in Wavefront file '%s'", filename.c_str( ) );
-				throw "unhandled token type in Wavefront file";
+				ifrit::log( IFRIT_WARN, "unhandled token type '%s' in Wavefront file '%s' at line %d", token_type.c_str( ), filename.c_str( ), linecnt );
 			}
+
+			linecnt++;
 		}
 
 		//Close the file
