@@ -57,6 +57,7 @@ ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::ini
 		std::string src;
 		const char *csrc;
 		if ( slurp_file( src, spec.filename ) ) throw "Loading shader file failed";
+		csrc = src.c_str( );
 		
 		//Create shader and load source code
 		GLuint shader = glCreateShader( spec.shader_type );
