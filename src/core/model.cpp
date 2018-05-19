@@ -144,25 +144,6 @@ void ifrit::Model::load_obj_file( std::string filename )
 //Load OpenGL buffers while preserving data in vectors
 void ifrit::Model::load_buffers( )
 {
-
-}
-
-//Free OpenGL buffers while preserving data in vectors
-void ifrit::Model::free_buffers( )
-{
-	if ( !this->buffers_loaded ) return;
-
-	glDeleteBuffers( 1, &this->vertex_buffer_id );
-	glDeleteBuffers( 1, &this->uv_buffer_id );
-	glDeleteBuffers( 1, &this->normal_buffer_id );
-
-
-	this->buffers_loaded = false;
-}
-
-//Basic render function
-void ifrit::Model::draw( )
-{
 	if ( this->buffers_loaded ) return;
 
 	//Create and load vertex buffer
@@ -181,6 +162,25 @@ void ifrit::Model::draw( )
 	glBufferData( GL_ARRAY_BUFFER, sizeof( this->normals[0] ) * this->normals.size( ), &this->normals[0], GL_STATIC_DRAW );
 
 	this->buffers_loaded = true;
+}
+
+//Free OpenGL buffers while preserving data in vectors
+void ifrit::Model::free_buffers( )
+{
+	if ( !this->buffers_loaded ) return;
+
+	glDeleteBuffers( 1, &this->vertex_buffer_id );
+	glDeleteBuffers( 1, &this->uv_buffer_id );
+	glDeleteBuffers( 1, &this->normal_buffer_id );
+
+
+	this->buffers_loaded = false;
+}
+
+//Basic render function
+void ifrit::Model::draw( )
+{
+	
 }
 
 //Model constructor loading data from file
