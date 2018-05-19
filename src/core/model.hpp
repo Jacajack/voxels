@@ -15,7 +15,6 @@ namespace ifrit
 			//Model data
 			std::vector <glm::vec3> vertices;
 			std::vector <glm::vec3> normals;
-			std::vector <unsigned int> indices;
 			std::vector <glm::vec2> uvs;
 			bool buffers_loaded;
 
@@ -24,14 +23,14 @@ namespace ifrit
 
 		public:
 			//Buffer operations
-			void load_buffers( );
-			void free_buffers( );
+			virtual void load_buffers( );
+			virtual void free_buffers( );
 
 			//Render
-			void draw( );
+			virtual void draw( );
 
 			//Constructor and destructor
-			Model( std::string filename );
+			Model( std::string filename, bool load_buffers = true );
 			~Model( );
 	}
 };
