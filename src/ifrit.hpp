@@ -38,6 +38,7 @@ namespace ifrit
 	extern void __attribute__( ( format ( printf, 1, 2 ) ) ) log( const char *format, ... );
 	#define IFRIT_NOTICE 0
 	#define IFRIT_LOG IFRIT_NOTICE
+	#define IFRIT_INFO IFRIT_NOTICE
 	#define IFRIT_WARN   1
 	#define IFRIT_ERROR  2
 	#define IFRIT_DEBUG  3
