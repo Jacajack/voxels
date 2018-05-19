@@ -2,6 +2,7 @@
 #define IFRIT_MODEL_HPP
 
 #include <vector>
+#include <string>
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -30,9 +31,9 @@ namespace ifrit
 			virtual void draw( );
 
 			//Constructor and destructor
-			Model( std::string filename, bool load_buffers = true );
+			Model( std::string filename, bool should_load_buffers );
 			~Model( );
-	}
+	};
 };
 
 #endif

@@ -1,5 +1,8 @@
 #include "model.hpp"
+#include <string>
 #include <vector>
+#include <fstream>
+#include "../ifrit.hpp"
 
 //Very simple OBJ file loader
 void ifrit::Model::load_obj_file( std::string filename )
@@ -43,7 +46,7 @@ void ifrit::Model::load_obj_file( std::string filename )
 			{
 				glm::vec2 uv;
 				std::sscanf( token_data.c_str( ), "%f %f", &uv.x, &uv.y );
-				>uvs.push_back( uv );
+				uvs.push_back( uv );
 			}
 			else if ( token_type == "vn" ) //Normal data
 			{
@@ -65,11 +68,11 @@ void ifrit::Model::load_obj_file( std::string filename )
 					//Get the ID, defaulting to 1
 					try
 					{
-						id[i] = std::atoi( token_data, offset );
+						ids[i] = std::atoi( token_data.c_str( ) + offset );
 					}
 					catch ( std::invalid_argument )
 					{
-						id[i] = 1;
+						ids[i] = 1;
 					}
 
 					offset = std::min( token_data.find( " ", offset ), token_data.find( "/", offset ) );
@@ -90,7 +93,7 @@ void ifrit::Model::load_obj_file( std::string filename )
 			}
 			else
 			{
-				infrit::log( LOG_ERROR, "unhandled token type in Wavefront file '%s'", filename.c_str( ) );
+				ifrit::log( IFRIT_ERROR, "unhandled token type in Wavefront file '%s'", filename.c_str( ) );
 				throw "unhandled token type in Wavefront file";
 			}
 		}
@@ -100,63 +103,64 @@ void ifrit::Model::load_obj_file( std::string filename )
 	}
 	else
 	{
-		infrit::log( LOG_ERROR, "cannot load Wavefront file '%s'", filename.c_str( ) );
+		ifrit::log( IFRIT_ERROR, "cannot load Wavefront file '%s'", filename.c_str( ) );
 		throw "cannot load Wavefront file";
 	}
 
 	//Log info
-	ifrit::log( IFRIT_LOG, "loaded %d vertices, %d normals and %d UVs from %s", vertices.size( ), normals.size( ), uvs.size( ), filename.c_str( ) );
+	ifrit::log( IFRIT_LOG, "loaded %ld vertices, %ld normals and %ld UVs from %s", vertices.size( ), normals.size( ), uvs.size( ), filename.c_str( ) );
 
 	//Dispatch data
-	for ( unsigned int i = 0; i < vids.size( ); i++ )
+	unsigned int missing_vertices = 0, missing_normals = 0, missing_uvs = 0;
+	for ( unsigned int i = 0; i < vertex_ids.size( ); i++ )
 	{
-		unsigned int vid = vids[i] - 1;
-		unsigned int uvid = uvids[i] - 1;
-		unsigned int nid = nids[i] - 1;
+		unsigned int vertex_id = vertex_ids[i] - 1;
+		unsigned int uv_id = uv_ids[i] - 1;
+		unsigned int normal_id = normal_ids[i] - 1;
 
-		if ( vid >= vertices.size( ) )
+		if ( vertex_id >= vertices.size( ) )
 		{
 			missing_vertices++;
 			this->vertices.push_back( glm::vec3( 0.0 ) );
 		}
-		else this->vertices.push_back( glm::vec3( vertices[vid] ) );
+		else this->vertices.push_back( glm::vec3( vertices[vertex_id] ) );
 
-		if ( uvid >= uvs.size( ) )
+		if ( uv_id >= uvs.size( ) )
 		{
 			missing_uvs++;
 			this->uvs.push_back( glm::vec2( 0.0 ) );
 		}
-		else this->uvs.push_back( glm::vec2( uvs[uvid] ) );
+		else this->uvs.push_back( glm::vec2( uvs[uv_id] ) );
 		
-		if ( nid >= normals.size( ) )
+		if ( normal_id >= normals.size( ) )
 		{
 			missing_normals++;
 			this->normals.push_back( glm::vec3( 0.0 ) );
 		}
-		else this->normals.push_back( glm::vec3( normals[nid] ) );
+		else this->normals.push_back( glm::vec3( normals[normal_id] ) );
 	}
 }
 
 //Load OpenGL buffers while preserving data in vectors
-virtual void ifrit::Model::load_buffers( )
+void ifrit::Model::load_buffers( )
 {
 
 }
 
 //Free OpenGL buffers while preserving data in vectors
-virtual void ifrit::Model::free_buffers( )
+void ifrit::Model::free_buffers( )
 {
 
 }
 
 //Basic render function
-virtual void ifrit::Model::draw( )
+void ifrit::Model::draw( )
 {
 
 }
 
 //Model constructor loading data from file
-ifrit::Model::Model( std::string filename, bool load_buffers = true )
+ifrit::Model::Model( std::string filename, bool should_load_buffers = true )
 {
 	//Buffers are not loaded by default
 	this->buffers_loaded = false;
@@ -165,7 +169,7 @@ ifrit::Model::Model( std::string filename, bool load_buffers = true )
 	load_obj_file( filename );
 
 	//Load buffers
-	if ( load_buffer )
+	if ( should_load_buffers )
 	{
 		load_buffers( );
 	}
