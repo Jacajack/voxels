@@ -5,6 +5,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "core/shader.hpp"
+#include "core/model.hpp"
+#include "core/scene.hpp"
+
 //3D engine main namespace
 namespace ifrit
 {
