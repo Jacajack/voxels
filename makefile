@@ -6,7 +6,7 @@ LIBS = -lpthread -lGL -lglfw -lGLEW -lpng16
 SRC = src/demo.cpp src/ifrit.cpp
 
 all:
-	-rm game
+	-rm demo
 	$(CXX) $(CXXFLAGS) $(SRC) $(LIBS) -o demo
 
 install_deps:
