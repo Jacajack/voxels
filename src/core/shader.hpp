@@ -5,7 +5,6 @@
 #include <vector>
 #include <string>
 #include <map>
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
