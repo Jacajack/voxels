@@ -23,7 +23,7 @@ namespace ifrit
 	{
 		private:
 			GLuint program_id;
-			std::map <std::string, GLuint> uniforms;
+			std::map <std::string, GLint> uniforms;
 			bool ready;
 
 		public:
