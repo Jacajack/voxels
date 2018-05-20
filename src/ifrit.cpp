@@ -30,6 +30,10 @@ void __attribute__( ( format ( printf, 2, 3 ) ) ) ifrit::log( int level, const c
 			std::printf( "ifrit_dbg: \x1b[32m" );
 			break;
 
+		case IFRIT_DEBUG_WARN:
+			std::printf( "ifrit_dbg: \x1b[33m" );
+			break;
+
 		case IFRIT_ERROR:
 		default:
 			std::printf( "ifrit: \x1b[31m" );

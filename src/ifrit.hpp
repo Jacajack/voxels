@@ -42,6 +42,7 @@ namespace ifrit
 	#define IFRIT_WARN   1
 	#define IFRIT_ERROR  2
 	#define IFRIT_DEBUG  3
+	#define IFRIT_DEBUG_WARN 4
 };
 
 #endif
