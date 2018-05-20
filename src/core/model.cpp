@@ -70,10 +70,9 @@ void ifrit::Model::load_obj_file( std::string filename )
 
 				char *strtok_buf = NULL;
 				int token_id = 0;
-				for ( const char *token = strtok_r( linebuf, "/ ", &strtok_buf ); token != NULL; token = strtok_r( NULL, "/ ", &strtok_buf ), token_id++ )
+				for ( const char *token = strtok_r( linebuf, "/ ", &strtok_buf ); token != NULL && token_id < 9; token = strtok_r( NULL, "/ ", &strtok_buf ), token_id++ )
 				{
 					ids[token_id] = std::atoi( token );
-					ifrit::log( IFRIT_DEBUG, "'%s'", token );
 				}
 
 				free( linebuf );
