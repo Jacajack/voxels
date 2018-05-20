@@ -15,10 +15,6 @@ out vec2 v_uv_o;
 out vec3 v_pos_world;
 out vec3 v_pos_camera;
 
-//Vector from vertex to the camera (in camera space)
-out vec3 v_eye_camera;
-out vec3 v_normal_camera;
-
 void main( )
 {
 	//Camera transformation
@@ -32,10 +28,6 @@ void main( )
 
 	//Position on screen	
 	gl_Position = mat_projection * vec4(v_pos_camera, 1);
-
-	//From vertex to camera
-	v_eye_camera = vec3(0, 0, 0) - v_pos_camera;
-	v_normal_camera = (mat_view * mat_model * vec4(v_normal_model, 0)).xyz;
 
 
 	//Just pass on the color to the fragment shader
