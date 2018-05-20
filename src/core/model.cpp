@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <string.h>
 #include "../ifrit.hpp"
 
 //Very simple OBJ file loader
@@ -60,27 +61,22 @@ void ifrit::Model::load_obj_file( std::string filename )
 			{
 				//IDs
 				unsigned int ids[9];
-
-				//How far gone are we?
-				size_t offset = 0;
-
-				//Read data from the line
-				for ( int i = 0; i < 9; i++ )
+				char *linebuf = strdup( token_data.c_str( ) );
+				if ( linebuf == NULL )
 				{
-					//Get the ID, defaulting to 1
-					try
-					{
-						ids[i] = std::atoi( token_data.c_str( ) + offset );
-					}
-					catch ( std::invalid_argument )
-					{
-						ids[i] = 1;
-					}
-
-					offset = std::min( token_data.find( " ", offset ), token_data.find( "/", offset ) );
-					if ( offset == std::string::npos ) break;
-					offset++;
+					ifrit::log( IFRIT_ERROR, "stdup() failed!" );
+					throw "strdup() returned NULL";
 				}
+
+				char *strtok_buf = NULL;
+				int token_id = 0;
+				for ( const char *token = strtok_r( linebuf, "/ ", &strtok_buf ); token != NULL; token = strtok_r( NULL, "/ ", &strtok_buf ), token_id++ )
+				{
+					ids[token_id] = std::atoi( token );
+					ifrit::log( IFRIT_DEBUG, "'%s'", token );
+				}
+
+				free( linebuf );
 
 				//Push IDs
 				vertex_ids.push_back( ids[0] );
