@@ -126,9 +126,9 @@ ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::ini
 	{
 		this->uniforms[uniform] = glGetUniformLocation( this->program_id, uniform.c_str( ) );
 		if ( this->uniforms[uniform] < 0 )
-			ifrit::log( IFRIT_DEBUG_WARN, "unused uniform '%s' at %ld", uniform.c_str( ), (long) this->uniforms[uniform] );
+			ifrit::log( IFRIT_DEBUG_WARN, "unused uniform '%s'", uniform.c_str( ) );
 		else
-			ifrit::log( IFRIT_DEBUG, "uniform '%s'", uniform.c_str( ) );
+			ifrit::log( IFRIT_DEBUG, "uniform '%s' at %ld", uniform.c_str( ), (long) this->uniforms[uniform] );
 	}
 
 	//Shader loaded
