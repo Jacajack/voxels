@@ -7,6 +7,8 @@
 
 #include "core/shader.hpp"
 #include "core/model.hpp"
+#include "core/texture.hpp"
+#include "core/texmodel.hpp"
 #include "core/scene.hpp"
 
 //3D engine main namespace
