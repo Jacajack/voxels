@@ -17,7 +17,7 @@ namespace ifrit
 			std::vector <ifrit::Model*> models;
 
 		public:
-			void addObject( ifrit::Model *model );
+			void add( ifrit::Model *model );
 			void draw( );
 
 			//Constructor and destructor
