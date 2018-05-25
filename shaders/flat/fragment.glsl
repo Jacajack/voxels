@@ -4,7 +4,10 @@
 //Output color
 in vec2 v_uv_o;
 
+uniform sampler2D texture_sampler;
+
 out vec3 color;
+
 
 void main()
 {
@@ -17,7 +20,8 @@ void main()
 	//loat theta = dot(normalize(light_dir), normalize(v_normal_camera));
 
 	//Just apply the color from vertex shader
-	color = vec3( 1, 1, 1 );//model_color;// * cosTheta;
+	//color = vec3( 1, 1, 1 );//model_color;// * cosTheta;
 
+	color = texture(texture_sampler, v_uv_o).rgb;
 
 }
