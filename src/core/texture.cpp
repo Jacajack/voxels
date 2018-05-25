@@ -182,7 +182,7 @@ int ifrit::Texture::get_height( )
 ifrit::Texture::Texture( std::string filename )
 {
 	this->load_image_data( filename );
-	this->generate_texture( this->width, this->height, GL_UNSIGNED_BYTE, this->format, GL_RGB );
+	this->generate_texture( this->width, this->height, GL_UNSIGNED_BYTE, this->format, GL_RGB, this->image_data );
 }
 
 //Texture destructor
