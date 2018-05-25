@@ -7,6 +7,10 @@
 //Simple, default allocation constructor
 ifrit::Texture::Texture( int width, int height, GLenum datatype, GLenum format, GLenum iformat )
 {
+	this->texture_loaded = false;
+	this->width = width;
+	this->height = height;
+
 	//Generate texture
 	glGenTextures( 1, &this->texture_id );
 
@@ -25,10 +29,20 @@ ifrit::Texture::Texture( int width, int height, GLenum datatype, GLenum format, 
 	//Generate mipmaps
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0 );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 );
+
+	//Consider texture loaded
+	this->texture_loaded = true;
 }
 
 //Constructor loading data from file
-ifrit::Texture( std::string filename )
+ifrit::Texture::Texture( std::string filename )
 {
 
+}
+
+//Texture destructor
+ifrit::Texture::~Texture( )
+{
+	if ( this->texture_loaded )
+		glDeleteTextures( 1, &this->texture_id );
 }
