@@ -225,7 +225,7 @@ void ifrit::Model::draw( )
 }
 
 //Model constructor loading data from file
-ifrit::Model::Model( std::string filename, bool should_load_buffers = true )
+ifrit::Model::Model( std::string filename, bool should_load_buffers )
 {
 	//Buffers are not loaded by default
 	this->buffers_loaded = false;

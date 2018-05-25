@@ -26,7 +26,7 @@ void ifrit::TexturedModel::draw( ifrit::Shader &shader )
 }
 
 //The default constructor
-ifrit::TexturedModel::TexturedModel( std::string model_filename, std::string texture_filename, bool should_load_buffers = true )
+ifrit::TexturedModel::TexturedModel( std::string model_filename, std::string texture_filename, bool should_load_buffers )
 	: Model( model_filename, should_load_buffers )
 {
 	this->own_texture = true;
@@ -34,7 +34,7 @@ ifrit::TexturedModel::TexturedModel( std::string model_filename, std::string tex
 }
 
 //Constructor using texture ref
-ifrit::TexturedModel::TexturedModel( std::string model_filename, ifrit::Texture *texture, bool should_load_buffers = true )
+ifrit::TexturedModel::TexturedModel( std::string model_filename, ifrit::Texture *texture, bool should_load_buffers )
 	: Model( model_filename, should_load_buffers )
 {
 	this->own_texture = false;

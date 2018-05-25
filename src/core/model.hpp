@@ -34,7 +34,7 @@ namespace ifrit
 			virtual void draw( );
 
 			//Constructor and destructor
-			Model( std::string filename, bool should_load_buffers );
+			Model( std::string filename, bool should_load_buffers = true );
 			~Model( );
 	};
 };
