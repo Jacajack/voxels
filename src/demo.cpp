@@ -28,7 +28,7 @@ int main( int argc, char **argv )
 		}
 	);
 
-	ifrit::Model unicorn( "models/unicorn.obj", true );
+	ifrit::TexturedModel unicorn( "models/unicorn.obj", "models/uni.png", true );
 
 	glm::mat4 mat_model( 1.0 );
 	glm::mat4 mat_view = glm::lookAt(
@@ -50,7 +50,7 @@ int main( int argc, char **argv )
 	glUniformMatrix4fv( shader.uniform( "mat_view" ), 1, GL_FALSE, &mat_view[0][0] );
 	glUniformMatrix4fv( shader.uniform( "mat_projection" ), 1, GL_FALSE, &mat_projection[0][0] );
 	glUniformMatrix4fv( shader.uniform( "mat_model" ), 1, GL_FALSE, &mat_model[0][0] );
-	glUniform1i( shader.uniform( "texture_sampler" ), 0 );
+	//glUniform1i( shader.uniform( "texture_sampler" ), 0 );
 
 
 
@@ -68,7 +68,7 @@ int main( int argc, char **argv )
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 
-		unicorn.draw( );
+		unicorn.draw( shader );
 		ifrit::update( );
 	}
 	while ( ifrit::status.active == true );
