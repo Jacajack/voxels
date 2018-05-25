@@ -1,5 +1,5 @@
-#ifndef IFRIT_SHADER_HPP
-#define IFRIT_SHADER_HPP
+#ifndef LOBOR_SHADER_HPP
+#define LOBOR_SHADER_HPP
 
 #include <initializer_list>
 #include <vector>
@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 
 
-namespace ifrit
+namespace lobor
 {
 	//Struct used just by Shader constructor
 	struct ShaderSpec

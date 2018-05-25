@@ -1,11 +1,11 @@
 #include <iostream>
-#include "ifrit.hpp"
+#include "lobor.hpp"
 
 
 int main( int argc, char **argv )
 {	
 	//Create window
-	if ( ifrit::init( 1024, 768, "Ifrit dev" ) ) return 1;
+	if ( lobor::init( 1024, 768, "Lobor dev" ) ) return 1;
 	
 
 	//Create vertex array
@@ -14,7 +14,7 @@ int main( int argc, char **argv )
 	glBindVertexArray(vertex_array_id);
 
 
-	ifrit::Shader shader(
+	lobor::Shader shader(
 		{
 			{"shaders/flat/vertex.glsl", GL_VERTEX_SHADER},
 			{"shaders/flat/fragment.glsl", GL_FRAGMENT_SHADER},
@@ -28,7 +28,7 @@ int main( int argc, char **argv )
 		}
 	);
 
-	ifrit::TexturedModel unicorn( "models/uni.obj", "models/uni.png" );
+	lobor::TexturedModel unicorn( "models/uni.obj", "models/uni.png" );
 
 	glm::mat4 mat_model( 1.0 );
 	glm::mat4 mat_view = glm::lookAt(
@@ -69,12 +69,12 @@ int main( int argc, char **argv )
 
 
 		unicorn.draw( shader );
-		ifrit::update( );
+		lobor::update( );
 	}
-	while ( ifrit::status.active == true );
+	while ( lobor::status.active == true );
 	
 	//Destroy
-	ifrit::destroy( );
+	lobor::destroy( );
 
 	return 0;
 }

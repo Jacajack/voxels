@@ -3,10 +3,10 @@
 #include <vector>
 #include <fstream>
 #include <string.h>
-#include "../ifrit.hpp"
+#include "../lobor.hpp"
 
 //Very simple OBJ file loader
-void ifrit::Model::load_obj_file( std::string filename )
+void lobor::Model::load_obj_file( std::string filename )
 {
 	//Open input file
 	std::ifstream objfile( filename, std::ios::in );
@@ -64,7 +64,7 @@ void ifrit::Model::load_obj_file( std::string filename )
 				char *linebuf = strdup( token_data.c_str( ) );
 				if ( linebuf == NULL )
 				{
-					ifrit::log( IFRIT_ERROR, "stdup() failed!" );
+					lobor::log( LOBOR_ERROR, "stdup() failed!" );
 					throw "strdup() returned NULL";
 				}
 
@@ -90,7 +90,7 @@ void ifrit::Model::load_obj_file( std::string filename )
 			}
 			else
 			{
-				ifrit::log( IFRIT_WARN, "unhandled token type '%s' in Wavefront file '%s' at line %d", token_type.c_str( ), filename.c_str( ), linecnt );
+				lobor::log( LOBOR_WARN, "unhandled token type '%s' in Wavefront file '%s' at line %d", token_type.c_str( ), filename.c_str( ), linecnt );
 			}
 
 			linecnt++;
@@ -101,12 +101,12 @@ void ifrit::Model::load_obj_file( std::string filename )
 	}
 	else
 	{
-		ifrit::log( IFRIT_ERROR, "cannot load Wavefront file '%s'", filename.c_str( ) );
+		lobor::log( LOBOR_ERROR, "cannot load Wavefront file '%s'", filename.c_str( ) );
 		throw "cannot load Wavefront file";
 	}
 
 	//Log info
-	ifrit::log( IFRIT_LOG, "loaded %ld vertices, %ld normals and %ld UVs from %s", vertices.size( ), normals.size( ), uvs.size( ), filename.c_str( ) );
+	lobor::log( LOBOR_LOG, "loaded %ld vertices, %ld normals and %ld UVs from %s", vertices.size( ), normals.size( ), uvs.size( ), filename.c_str( ) );
 
 	//Dispatch data
 	unsigned int missing_vertices = 0, missing_normals = 0, missing_uvs = 0;
@@ -140,7 +140,7 @@ void ifrit::Model::load_obj_file( std::string filename )
 }
 
 //Load OpenGL buffers while preserving data in vectors
-void ifrit::Model::load_buffers( )
+void lobor::Model::load_buffers( )
 {
 	if ( this->buffers_loaded ) return;
 
@@ -163,7 +163,7 @@ void ifrit::Model::load_buffers( )
 }
 
 //Free OpenGL buffers while preserving data in vectors
-void ifrit::Model::free_buffers( )
+void lobor::Model::free_buffers( )
 {
 	if ( !this->buffers_loaded ) return;
 
@@ -176,7 +176,7 @@ void ifrit::Model::free_buffers( )
 }
 
 //Basic render function
-void ifrit::Model::draw( )
+void lobor::Model::draw( )
 {
 	if ( !this->buffers_loaded ) load_buffers( );
 
@@ -225,7 +225,7 @@ void ifrit::Model::draw( )
 }
 
 //Model constructor loading data from file
-ifrit::Model::Model( std::string filename, bool should_load_buffers )
+lobor::Model::Model( std::string filename, bool should_load_buffers )
 {
 	//Buffers are not loaded by default
 	this->buffers_loaded = false;
@@ -241,7 +241,7 @@ ifrit::Model::Model( std::string filename, bool should_load_buffers )
 }
 
 //Model destructor
-ifrit::Model::~Model( )
+lobor::Model::~Model( )
 {
 	free_buffers( );
 }

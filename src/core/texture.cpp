@@ -2,11 +2,11 @@
 #include <string>
 #include <GL/glew.h>
 #include <libpng16/png.h>
-#include "../ifrit.hpp"
+#include "../lobor.hpp"
 
 
 //Simple, default allocation constructor
-void ifrit::Texture::generate_texture( int width, int height, GLenum type, GLenum format, GLenum iformat, const void *data = NULL )
+void lobor::Texture::generate_texture( int width, int height, GLenum type, GLenum format, GLenum iformat, const void *data = NULL )
 {
 	this->width = width;
 	this->height = height;
@@ -36,18 +36,18 @@ void ifrit::Texture::generate_texture( int width, int height, GLenum type, GLenu
 	//Consider texture loaded
 	this->texture_loaded = true;
 
-	ifrit::log( IFRIT_LOG, "generated %dx%d texture", width, height );
+	lobor::log( LOBOR_LOG, "generated %dx%d texture", width, height );
 }
 
 //Loading data from file
-void ifrit::Texture::load_image_data( std::string filename )
+void lobor::Texture::load_image_data( std::string filename )
 {
 	//Open texture file like C would
 	std::FILE *texfile;
 	texfile = std::fopen( filename.c_str( ), "rb" );
 	if ( texfile == NULL )
 	{
-		ifrit::log( IFRIT_ERROR, "could not open file `%s' for reading", filename.c_str( ) );
+		lobor::log( LOBOR_ERROR, "could not open file `%s' for reading", filename.c_str( ) );
 		throw "cannot load texture file";
 	}
 
@@ -55,7 +55,7 @@ void ifrit::Texture::load_image_data( std::string filename )
 	png_structp png = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
 	if ( png == NULL )
 	{
-		ifrit::log( IFRIT_ERROR, "libpng init failed" );
+		lobor::log( LOBOR_ERROR, "libpng init failed" );
 		throw "cannot init libpng";
 	}
 
@@ -63,7 +63,7 @@ void ifrit::Texture::load_image_data( std::string filename )
 	png_infop info = png_create_info_struct( png );
 	if ( info == NULL )
 	{
-		ifrit::log( IFRIT_ERROR, "cannot get PNG info from `%s'", filename.c_str( ) );
+		lobor::log( LOBOR_ERROR, "cannot get PNG info from `%s'", filename.c_str( ) );
 		throw "cannot get PNG info";
 	}
 
@@ -71,7 +71,7 @@ void ifrit::Texture::load_image_data( std::string filename )
 	if ( setjmp( png_jmpbuf( png ) ) )
 	{
 		png_destroy_read_struct( &png, &info, NULL );
-		ifrit::log( IFRIT_ERROR, "libpng error while loading `%s'", filename.c_str( ) );
+		lobor::log( LOBOR_ERROR, "libpng error while loading `%s'", filename.c_str( ) );
 		throw "libpng error";
 	}
 
@@ -92,33 +92,33 @@ void ifrit::Texture::load_image_data( std::string filename )
 		case PNG_COLOR_TYPE_GRAY:
 			this->format = GL_RGB;
 			png_set_gray_to_rgb( png );
-			ifrit::log( IFRIT_LOG, "converting grayscale PNG `%s'", filename.c_str( ) );
+			lobor::log( LOBOR_LOG, "converting grayscale PNG `%s'", filename.c_str( ) );
 			break;
 
 		//Grayscale + alpha
 		case PNG_COLOR_TYPE_GRAY_ALPHA:
 			this->format = GL_RGBA;
 			png_set_gray_to_rgb( png );
-			ifrit::log( IFRIT_LOG, "converting grayscale+alpha PNG `%s'", filename.c_str( ) );
+			lobor::log( LOBOR_LOG, "converting grayscale+alpha PNG `%s'", filename.c_str( ) );
 			break;
 
 		//Palette
 		case PNG_COLOR_TYPE_PALETTE:
 			this->format = GL_RGB;
 			png_set_expand( png );
-			ifrit::log( IFRIT_LOG, "converting palette PNG `%s'", filename.c_str( ) );
+			lobor::log( LOBOR_LOG, "converting palette PNG `%s'", filename.c_str( ) );
 			break;
 
 		//RGB
 		case PNG_COLOR_TYPE_RGB:
 			this->format = GL_RGB;
-			ifrit::log( IFRIT_LOG, "reading RGB PNG `%s'", filename.c_str( ) );
+			lobor::log( LOBOR_LOG, "reading RGB PNG `%s'", filename.c_str( ) );
 			break;
 
 		//RGBA
 		case PNG_COLOR_TYPE_RGBA:
 			this->format = GL_RGBA;
-			ifrit::log( IFRIT_LOG, "reading RGBA PNG `%s'", filename.c_str( ) );
+			lobor::log( LOBOR_LOG, "reading RGBA PNG `%s'", filename.c_str( ) );
 			break;
 
 		//Unhandled PNG
@@ -126,7 +126,7 @@ void ifrit::Texture::load_image_data( std::string filename )
 			png_destroy_info_struct( png, &info );
 			png_destroy_read_struct( &png, &info , NULL );
 			std::fclose( texfile );
-			ifrit::log( IFRIT_ERROR, "unhandled PNG type `%s'", filename.c_str( ) );
+			lobor::log( LOBOR_ERROR, "unhandled PNG type `%s'", filename.c_str( ) );
 			throw "unhandled PNG type";
 			break;
 	}
@@ -159,34 +159,34 @@ void ifrit::Texture::load_image_data( std::string filename )
 	png_destroy_read_struct( &png, &info, NULL );
 	std::fclose( texfile );
 
-	ifrit::log( IFRIT_LOG, "loaded %dx%d texture from file `%s'", width, height, filename.c_str( ) );
+	lobor::log( LOBOR_LOG, "loaded %dx%d texture from file `%s'", width, height, filename.c_str( ) );
 }
 
 //Getters
-GLuint ifrit::Texture::get_id( )
+GLuint lobor::Texture::get_id( )
 {
 	return this->id;
 }
 
-int ifrit::Texture::get_width( )
+int lobor::Texture::get_width( )
 {
 	return this->width;
 }
 
-int ifrit::Texture::get_height( )
+int lobor::Texture::get_height( )
 {
 	return this->height;
 }
 
 //Constructor loading from file
-ifrit::Texture::Texture( std::string filename )
+lobor::Texture::Texture( std::string filename )
 {
 	this->load_image_data( filename );
 	this->generate_texture( this->width, this->height, GL_UNSIGNED_BYTE, this->format, GL_RGB, this->image_data );
 }
 
 //Just texture allocation
-ifrit::Texture::Texture( int width, int height, GLenum type, GLenum format, GLenum iformat )
+lobor::Texture::Texture( int width, int height, GLenum type, GLenum format, GLenum iformat )
 {
 	this->image_data = nullptr;
 	this->image_data_loaded = false;
@@ -194,7 +194,7 @@ ifrit::Texture::Texture( int width, int height, GLenum type, GLenum format, GLen
 }
 
 //Texture destructor
-ifrit::Texture::~Texture( )
+lobor::Texture::~Texture( )
 {
 	if ( this->texture_loaded )
 		glDeleteTextures( 1, &this->id );

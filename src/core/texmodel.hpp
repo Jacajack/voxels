@@ -1,13 +1,13 @@
-#ifndef IFRIT_TEXMODEL_HPP
-#define IFRIT_TEXMODEL_HPP
+#ifndef LOBOR_TEXMODEL_HPP
+#define LOBOR_TEXMODEL_HPP
 
 #include <vector>
 #include <string>
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../ifrit.hpp"
+#include "../lobor.hpp"
 
-namespace ifrit
+namespace lobor
 {
 	//Just a textured model class
 	class TexturedModel : public Model
@@ -16,13 +16,13 @@ namespace ifrit
 			bool own_texture;
 
 		protected:
-			ifrit::Texture *texture;
+			lobor::Texture *texture;
 
 		public:
-			virtual void draw( ifrit::Shader &shader );
+			virtual void draw( lobor::Shader &shader );
 
 			TexturedModel( std::string model_filename, std::string texture_filename, bool should_load_buffers = true );
-			TexturedModel( std::string model_filename, ifrit::Texture *texture, bool should_load_buffers = true );
+			TexturedModel( std::string model_filename, lobor::Texture *texture, bool should_load_buffers = true );
 			~TexturedModel( );
 	};
 };

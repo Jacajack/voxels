@@ -1,42 +1,42 @@
-#include "ifrit.hpp"
+#include "lobor.hpp"
 #include <iostream>
 #include <string>
 #include <stdarg.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-//Ifrit includes
+//Lobor includes
 #include "core/shader.hpp"
 
-//Ifrit structs
-struct ifrit::WindowInformation ifrit::win;
-struct ifrit::CoreStatus ifrit::status;
+//Lobor structs
+struct lobor::WindowInformation lobor::win;
+struct lobor::CoreStatus lobor::status;
 
 //Logger function
-void __attribute__( ( format ( printf, 2, 3 ) ) ) ifrit::log( int level, const char *format, ... )
+void __attribute__( ( format ( printf, 2, 3 ) ) ) lobor::log( int level, const char *format, ... )
 {
 	//Select color
 	switch ( level )
 	{
-		case IFRIT_NOTICE:
-			std::printf( "ifrit: \x1b[37m" );
+		case LOBOR_NOTICE:
+			std::printf( "lobor: \x1b[37m" );
 			break;
 
-		case IFRIT_WARN:
-			std::printf( "ifrit: \x1b[33m" );
+		case LOBOR_WARN:
+			std::printf( "lobor: \x1b[33m" );
 			break;
 
-		case IFRIT_DEBUG:
-			std::printf( "ifrit_dbg: \x1b[32m" );
+		case LOBOR_DEBUG:
+			std::printf( "lobor_dbg: \x1b[32m" );
 			break;
 
-		case IFRIT_DEBUG_WARN:
-			std::printf( "ifrit_dbg: \x1b[33m" );
+		case LOBOR_DEBUG_WARN:
+			std::printf( "lobor_dbg: \x1b[33m" );
 			break;
 
-		case IFRIT_ERROR:
+		case LOBOR_ERROR:
 		default:
-			std::printf( "ifrit: \x1b[31m" );
+			std::printf( "lobor: \x1b[31m" );
 			break;
 	}
 
@@ -49,33 +49,33 @@ void __attribute__( ( format ( printf, 2, 3 ) ) ) ifrit::log( int level, const c
 }
 
 //Log function wrapper
-void __attribute__( ( format ( printf, 1, 2 ) ) ) ifrit::log( const char *format, ... )
+void __attribute__( ( format ( printf, 1, 2 ) ) ) lobor::log( const char *format, ... )
 {
 	va_list ap;
 	va_start( ap, format );
-	ifrit::log( IFRIT_NOTICE, format, ap );
+	lobor::log( LOBOR_NOTICE, format, ap );
 	va_end( ap );
 }
 
 //The renderer
-void ifrit::update( )
+void lobor::update( )
 {
-	if ( ifrit::status.active == false ) return;
+	if ( lobor::status.active == false ) return;
 
 
 	//Update buffers and poll events
-	glfwSwapBuffers( ifrit::win.window );
+	glfwSwapBuffers( lobor::win.window );
 	glfwPollEvents( );
-	ifrit::status.active = !glfwWindowShouldClose( ifrit::win.window );
+	lobor::status.active = !glfwWindowShouldClose( lobor::win.window );
 }
 
 //3D engine init routine
-int ifrit::init( int resx, int resy, std::string title )
+int lobor::init( int resx, int resy, std::string title )
 {
 	//GLFW init
 	if ( !glfwInit( ) )
 	{
-		ifrit::log( IFRIT_ERROR, "GLFW init failed" );
+		lobor::log( LOBOR_ERROR, "GLFW init failed" );
 		//std::cerr << "ifirt: GLFW init failed\n";
 		return 1;
 	}
@@ -89,38 +89,38 @@ int ifrit::init( int resx, int resy, std::string title )
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
 	//Create the window
-	ifrit::win.resx = resx;
-	ifrit::win.resy = resy;
-	ifrit::win.title = title;
-	ifrit::win.window = glfwCreateWindow( ifrit::win.resx, ifrit::win.resy, ifrit::win.title.c_str( ), NULL, NULL );
-	if ( ifrit::win.window == NULL )
+	lobor::win.resx = resx;
+	lobor::win.resy = resy;
+	lobor::win.title = title;
+	lobor::win.window = glfwCreateWindow( lobor::win.resx, lobor::win.resy, lobor::win.title.c_str( ), NULL, NULL );
+	if ( lobor::win.window == NULL )
 	{
-		std::cerr << "ifrit: Window creation failed\n";
+		std::cerr << "lobor: Window creation failed\n";
 		glfwTerminate( );
 		return 1;
 	}
-	glfwMakeContextCurrent( ifrit::win.window );
+	glfwMakeContextCurrent( lobor::win.window );
 
 	//GLEW init
 	glewExperimental = true;
 	if ( glewInit( ) != GLEW_OK )
 	{
-		std::cerr << "ifrit: GLEW init failed!\n";
+		std::cerr << "lobor: GLEW init failed!\n";
 		glfwTerminate( );
 		return 1;
 	}
 
 	//Input modes
-	glfwSetInputMode( ifrit::win.window, GLFW_STICKY_KEYS, GL_TRUE );
+	glfwSetInputMode( lobor::win.window, GLFW_STICKY_KEYS, GL_TRUE );
 
-	//Consider Ifrit running
-	ifrit::status.active = true;
+	//Consider Lobor running
+	lobor::status.active = true;
 
 	return 0;
 };
 
 //Cleanup function
-void ifrit::destroy( )
+void lobor::destroy( )
 {
 	glfwTerminate( );
 }

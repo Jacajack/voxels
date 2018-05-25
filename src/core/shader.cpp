@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "../ifrit.hpp"
+#include "../lobor.hpp"
 
 //Slurp file into std::string
 static int slurp_file( std::string &str, std::string filename )
@@ -21,7 +21,7 @@ static int slurp_file( std::string &str, std::string filename )
 	else
 	{
 		//Bail out
-		ifrit::log( IFRIT_ERROR, "cannot read file '%s'", filename.c_str( ) );
+		lobor::log( LOBOR_ERROR, "cannot read file '%s'", filename.c_str( ) );
 		return 1;
 	}
 
@@ -30,19 +30,19 @@ static int slurp_file( std::string &str, std::string filename )
 }
 
 //Uniform getter
-GLuint ifrit::Shader::uniform( std::string name )
+GLuint lobor::Shader::uniform( std::string name )
 {
 	return this->uniforms[name];
 }
 
 //Use program
-void ifrit::Shader::use( )
+void lobor::Shader::use( )
 {
 	glUseProgram( this->program_id );
 }
 
 //Shader set constructor
-ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::initializer_list <std::string> uniform_names )
+lobor::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::initializer_list <std::string> uniform_names )
 {
 	//Shader is not ready by default
 	this->ready = false;
@@ -51,10 +51,10 @@ ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::ini
 	std::vector <GLuint> shaders;
 
 	//Load all shaders
-	for ( struct ifrit::ShaderSpec spec : specs )
+	for ( struct lobor::ShaderSpec spec : specs )
 	{
 		//Log
-		ifrit::log( IFRIT_INFO, "loading shader file '%s'", spec.filename.c_str( ) );
+		lobor::log( LOBOR_INFO, "loading shader file '%s'", spec.filename.c_str( ) );
 
 		//Shader source code
 		std::string src;
@@ -80,7 +80,7 @@ ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::ini
 		{
 			std::vector <char> message( loglength + 1 );
 			glGetShaderInfoLog( shader, loglength, NULL, &message[0] );
-			ifrit::log( IFRIT_ERROR, "shader file '%s' compilation failed:\n%s", spec.filename.c_str( ), &message[0] );
+			lobor::log( LOBOR_ERROR, "shader file '%s' compilation failed:\n%s", spec.filename.c_str( ), &message[0] );
 			throw "shader compilation failed";
 		}
 
@@ -109,7 +109,7 @@ ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::ini
 	{
 		std::vector <char> message( loglength + 1 );
 		glGetShaderInfoLog( this->program_id, loglength, NULL, &message[0] );
-		ifrit::log( IFRIT_ERROR, "shader linking failed:\n%s", &message[0] );
+		lobor::log( LOBOR_ERROR, "shader linking failed:\n%s", &message[0] );
 		throw "shader linking failed";
 	}
 
@@ -126,9 +126,9 @@ ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::ini
 	{
 		this->uniforms[uniform] = glGetUniformLocation( this->program_id, uniform.c_str( ) );
 		if ( this->uniforms[uniform] < 0 )
-			ifrit::log( IFRIT_DEBUG_WARN, "unused uniform '%s'", uniform.c_str( ) );
+			lobor::log( LOBOR_DEBUG_WARN, "unused uniform '%s'", uniform.c_str( ) );
 		else
-			ifrit::log( IFRIT_DEBUG, "uniform '%s' at %ld", uniform.c_str( ), (long) this->uniforms[uniform] );
+			lobor::log( LOBOR_DEBUG, "uniform '%s' at %ld", uniform.c_str( ), (long) this->uniforms[uniform] );
 	}
 
 	//Shader loaded
@@ -136,7 +136,7 @@ ifrit::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::ini
 }
 
 //Shader destructor
-ifrit::Shader::~Shader( )
+lobor::Shader::~Shader( )
 {
 	if ( this->ready ) glDeleteProgram( this->program_id );
 }

@@ -1,11 +1,11 @@
-#ifndef IFRIT_TEXTURE_HPP
-#define IFRIT_TEXTURE_HPP
+#ifndef LOBOR_TEXTURE_HPP
+#define LOBOR_TEXTURE_HPP
 
 #include <string>
 #include <inttypes.h>
 #include <GL/glew.h>
 
-namespace ifrit
+namespace lobor
 {
 	class Texture
 	{

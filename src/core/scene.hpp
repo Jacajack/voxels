@@ -1,5 +1,5 @@
-#ifndef IFRIT_SCENE_HPP
-#define IFRIT_SCENE_HPP
+#ifndef LOBOR_SCENE_HPP
+#define LOBOR_SCENE_HPP
 
 #include <vector>
 #include "model.hpp"
@@ -8,16 +8,16 @@
 	Note: most of this needs recoding
 */
 
-namespace ifrit
+namespace lobor
 {
 	//The whole scene meant for drawing
 	class Scene
 	{
 		protected:
-			std::vector <ifrit::Model*> models;
+			std::vector <lobor::Model*> models;
 
 		public:
-			void add( ifrit::Model *model );
+			void add( lobor::Model *model );
 			void draw( );
 
 			//Constructor and destructor

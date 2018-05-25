@@ -1,5 +1,5 @@
-#ifndef IFRIT_HPP
-#define IFRIT_HPP
+#ifndef LOBOR_HPP
+#define LOBOR_HPP
 
 #include <string>
 #include <GL/glew.h>
@@ -12,7 +12,7 @@
 #include "core/scene.hpp"
 
 //3D engine main namespace
-namespace ifrit
+namespace lobor
 {
 	//Window data
 	extern struct WindowInformation
@@ -38,13 +38,13 @@ namespace ifrit
 	//Utils
 	extern void __attribute__( ( format ( printf, 2, 3 ) ) ) log( int level, const char *format, ... );
 	extern void __attribute__( ( format ( printf, 1, 2 ) ) ) log( const char *format, ... );
-	#define IFRIT_NOTICE 0
-	#define IFRIT_LOG IFRIT_NOTICE
-	#define IFRIT_INFO IFRIT_NOTICE
-	#define IFRIT_WARN   1
-	#define IFRIT_ERROR  2
-	#define IFRIT_DEBUG  3
-	#define IFRIT_DEBUG_WARN 4
+	#define LOBOR_NOTICE 0
+	#define LOBOR_LOG LOBOR_NOTICE
+	#define LOBOR_INFO LOBOR_NOTICE
+	#define LOBOR_WARN   1
+	#define LOBOR_ERROR  2
+	#define LOBOR_DEBUG  3
+	#define LOBOR_DEBUG_WARN 4
 };
 
 #endif

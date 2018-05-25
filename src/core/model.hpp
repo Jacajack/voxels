@@ -1,12 +1,12 @@
-#ifndef IFRIT_MODEL_HPP
-#define IFRIT_MODEL_HPP
+#ifndef LOBOR_MODEL_HPP
+#define LOBOR_MODEL_HPP
 
 #include <vector>
 #include <string>
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace ifrit
+namespace lobor
 {
 	//This is basic renderable model
 	//All things in the world that you can see derive from this class... And it's true no matter whether or not you believe in it

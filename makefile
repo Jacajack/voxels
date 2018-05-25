@@ -5,7 +5,7 @@ CXXFLAGS = -DGLM_ENABLE_EXPERIMENTAL -Wall --std=c++11 $(DEBUG)
 LIBS = -lpthread -lGL -lglfw -lGLEW -lpng16
 SRC = \
 	src/demo.cpp \
-	src/ifrit.cpp \
+	src/lobor.cpp \
 	src/core/shader.cpp \
 	src/core/model.cpp \
 	src/core/texture.cpp \

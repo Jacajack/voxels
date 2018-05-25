@@ -1,29 +1,29 @@
 #include "scene.hpp"
-#include "../ifrit.hpp"
+#include "../lobor.hpp"
 
 //Add new object to the scene
-void ifrit::Scene::add( ifrit::Model *model )
+void lobor::Scene::add( lobor::Model *model )
 {
 	this->models.push_back( model );
 }
 
 //Whole scene render
-void ifrit::Scene::draw( )
+void lobor::Scene::draw( )
 {
-	for ( ifrit::Model *model : this->models )
+	for ( lobor::Model *model : this->models )
 	{
 		model->draw( );
 	}
 }
 
 //Scene constructor
-ifrit::Scene::Scene( )
+lobor::Scene::Scene( )
 {
 
 }
 
 //Scene destructor
-ifrit::Scene::~Scene( )
+lobor::Scene::~Scene( )
 {
 
 }
