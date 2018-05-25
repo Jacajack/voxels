@@ -18,8 +18,8 @@ namespace ifrit
 
 		protected:
 		public:
-			Texture( int width, int height );
-			Texture( int width, int height, std::string filename );
+			Texture( int width, int height, GLenum datatype, GLenum format, GLenum iformat );
+			Texture( std::string filename );
 			~Texture( );
 	};
 };
