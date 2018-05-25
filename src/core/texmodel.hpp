@@ -19,7 +19,7 @@ namespace ifrit
 			ifrit::Texture *texture;
 
 		public:
-			virtual void draw( );
+			virtual void draw( ifrit::Shader &shader );
 
 			TexturedModel( std::string model_filename, std::string texture_filename, bool should_load_buffers );
 			TexturedModel( std::string model_filename, ifrit::Texture *texture, bool should_load_buffers );
