@@ -31,7 +31,7 @@ namespace ifrit
 			int get_width( );
 			int get_height( );
 
-			Texture( int width, int height, GLenum datatype, GLenum format, GLenum iformat );
+			Texture( int width, int height, GLenum type, GLenum format, GLenum iformat );
 			Texture( std::string filename );
 			~Texture( );
 	};

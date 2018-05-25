@@ -185,6 +185,14 @@ ifrit::Texture::Texture( std::string filename )
 	this->generate_texture( this->width, this->height, GL_UNSIGNED_BYTE, this->format, GL_RGB, this->image_data );
 }
 
+//Just texture allocation
+ifrit::Texture::Texture( int width, int height, GLenum type, GLenum format, GLenum iformat )
+{
+	this->image_data = nullptr;
+	this->image_data_loaded = false;
+	this->generate_texture( width, height, type, format, iformat );
+}
+
 //Texture destructor
 ifrit::Texture::~Texture( )
 {
