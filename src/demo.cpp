@@ -28,7 +28,7 @@ int main( int argc, char **argv )
 		}
 	);
 
-	ifrit::TexturedModel unicorn( "models/unicorn.obj", "models/uni.png", true );
+	ifrit::TexturedModel unicorn( "models/uni.obj", "models/uni.png" );
 
 	glm::mat4 mat_model( 1.0 );
 	glm::mat4 mat_view = glm::lookAt(
