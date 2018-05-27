@@ -6,6 +6,8 @@ int main( int argc, char **argv )
 {	
 	//Create window
 	if ( lobor::init( 1024, 768, "Lobor dev" ) ) return 1;
+	lobor::Window win( 1024, 768, "new window", lobor::win.window );
+	win.use( );
 	
 
 	//Create vertex array
@@ -69,7 +71,9 @@ int main( int argc, char **argv )
 
 
 		unicorn.draw( shader );
+
 		lobor::update( );
+		//win.swap_buffers( );
 	}
 	while ( lobor::status.active == true );
 	

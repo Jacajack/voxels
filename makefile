@@ -11,7 +11,8 @@ SRC = \
 	src/core/texture.cpp \
 	src/core/texmodel.cpp \
 	src/core/light.cpp \
-	src/core/scene.cpp 
+	src/core/scene.cpp \
+	src/core/window.cpp
 
 all:
 	-rm demo
