@@ -7,7 +7,18 @@ int main( int argc, char **argv )
 	//Create window
 	if ( lobor::init( 1024, 768, "Lobor dev" ) ) return 1;
 	lobor::Window win( 1024, 768, "new window", lobor::win.window );
+	
+	
+	GLuint vertex_array_ida;
+	glGenVertexArrays(1, &vertex_array_ida);
+	glBindVertexArray(vertex_array_ida);
+	
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	std::cout << glfwGetCurrentContext( ) << std::endl;
 	win.use( );
+	std::cout << glfwGetCurrentContext( ) << std::endl;
 	
 
 	//Create vertex array
@@ -66,14 +77,21 @@ int main( int argc, char **argv )
 	//Game loop
 	do
 	{
+		win.use( );
+		shader.use( );
 		glClearColor( 0.2, 0.2, 0.0, 0.0 );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-
 		unicorn.draw( shader );
-
+		win.swap_buffers( );
+		
+		glfwMakeContextCurrent( lobor::win.window );
+		shader.use( );
+		glClearColor( 0.2, 0.2, 0.0, 0.0 );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+		unicorn.draw( shader );
 		lobor::update( );
-		//win.swap_buffers( );
+
+		
 	}
 	while ( lobor::status.active == true );
 	
