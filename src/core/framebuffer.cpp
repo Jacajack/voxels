@@ -41,12 +41,34 @@ void lobor::Framebuffer::blit( GLuint source, int sx0, int sy0, int sx1, int sy1
 }
 
 //Constructors
-lobor::Framebuffer::Framebuffer( )
+lobor::Framebuffer::Framebuffer( int width, int height, int texture_count )
 {
-	//Generate framebuffer
-	glGenFramebuffers( 1, &this->id );
+	this->width = width;
+	this->height = height;
 
-	
+	//Generate framebuffer and bind it
+	glGenFramebuffers( 1, &this->id );
+	glBindFramebuffer( GL_FRAMEBUFFER, this->id );
+
+	//Limits
+	if ( texture_count > 32 )
+	{
+		lobor::log( LOBOR_ERROR, "framebuffer can't have more than 32 textures" );
+		throw "framebuffer 32 texture limit exceeded";
+	}
+	if ( texture_count > 8 )
+	{
+		lobor::log( LOBOR_WARN, "8 texture per framebuffer limit exceeded" );
+	}
+
+	//Generate the textures and store them in the `textures' vector
+	//TEMP: always RGB 8-bit
+	for ( int i = 0; i < texture_count; i++ )
+	{
+		lobor::Texture tex( width, height, GL_UNSIGNED_BYTE, GL_RGB, GL_RGB );
+		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, tex, 0 );
+		this->textures.push_back( tex );
+	}
 }
 
 //Destructor
@@ -54,4 +76,7 @@ lobor::Framebuffer::~Framebuffer( )
 {
 	//Destroy framebuffer
 	glDeleteFramebuffers( 1, &this->id );
+
+	//Destruct all the textures
+	textures.clear( );
 }
