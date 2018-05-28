@@ -106,6 +106,23 @@ int main( int argc, char **argv )
 	//Some serious manly C code here
 	GLuint fb;
 	glGenFramebuffers( 1, &fb );
+	glBindFramebuffer( GL_FRAMEBUFFER, fb );
+
+	GLuint t;
+	glGenTextures( 1, &t );
+	glBindTexture( GL_TEXTURE_2D, t );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 1024, 768, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, t, 0 );
+
+	
+	GLuint rbo;
+	glGenRenderbuffers( 1, &rbo );
+	glBindRenderbuffer( GL_RENDERBUFFER, rbo );
+	glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1024, 768 );
+	glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo );
+	
 
 	//Game loop
 	do
@@ -125,12 +142,13 @@ int main( int argc, char **argv )
 		
 		//We now copy the unicorn back to default FB
 		glBindFramebuffer( GL_READ_FRAMEBUFFER, fb );
+		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
 		glBlitFramebuffer( 0, 0, 1024, 768, 0, 0, 1024, 768, GL_COLOR_BUFFER_BIT, GL_NEAREST );
 
 		//fb.blit_to( 0, 0, 0, 1024, 768, 0, 0, 1024, 768, GL_COLOR_BUFFER_BIT, GL_NEAREST );
 		
 		win.swap_buffers( );
-		
+		/*
 		//fb.use( );
 		//glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		otherwin.use( );
@@ -141,7 +159,7 @@ int main( int argc, char **argv )
 		
 		//glBlitFramebuffer( 0, 0, 1024/4, 768/4, 1024/4, 768/4, 1024/2, 768/2, GL_COLOR_BUFFER_BIT, GL_NEAREST );
 		otherwin.swap_buffers( );
-		
+		*/
 		
 		glfwPollEvents( );
 		//std::cout << "a\n";
