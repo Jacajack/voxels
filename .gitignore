@@ -2,3 +2,5 @@ models/misc
 game
 demo
 .vscode
+build
+*.o
