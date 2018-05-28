@@ -21,6 +21,7 @@ namespace lobor
 
 			void use( bool read, bool draw );
 			void blit( GLuint source, int sx0, int sy0, int sx1, int sy1, int dx0, int dy0, int dx1, int dy1, GLbitfield mask, GLenum filter );
+			void blit_to( GLuint dest, int sx0, int sy0, int sx1, int sy1, int dx0, int dy0, int dx1, int dy1, GLbitfield mask, GLenum filter );
 
 			Framebuffer( int width, int height, int texture_count );
 			~Framebuffer( );

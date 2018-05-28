@@ -26,17 +26,45 @@ void lobor::Framebuffer::use( bool read = true, bool draw = true )
 void lobor::Framebuffer::blit( GLuint source, int sx0, int sy0, int sx1, int sy1, int dx0, int dy0, int dx1, int dy1, 
 	GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST )
 {
-	//Save current draw framebuffer
-	GLint fbod = 0;
+	//Save current framebuffers
+	GLint fbod = 0, fbor = 0;
+	glGetIntegerv( GL_READ_FRAMEBUFFER_BINDING, &fbor );
 	glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &fbod );
 
 	//Use this framebuffer for drawing
 	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, this->id );
 
+	//Use specified framebuffer for reading
+	glBindFramebuffer( GL_READ_FRAMEBUFFER, source );
+
 	//Do da blit
 	glBlitFramebuffer( sx0, sy0, sx1, sy1, dx0, dy0, dx1, dy1, mask, filter );
 
-	//Bind the old framebuffer back
+	//Bind the old framebuffers back
+	glBindFramebuffer( GL_READ_FRAMEBUFFER, fbor );
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, fbod );
+}
+
+//Copy data from this framebuffer
+void lobor::Framebuffer::blit_to( GLuint dest, int sx0, int sy0, int sx1, int sy1, int dx0, int dy0, int dx1, int dy1, 
+	GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST )
+{
+	//Save current framebuffers
+	GLint fbod = 0, fbor = 0;
+	glGetIntegerv( GL_READ_FRAMEBUFFER_BINDING, &fbor );
+	glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &fbod );
+
+	//Use specified framebuffer for drawing
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, dest );
+
+	//Use this framebuffer for reading
+	glBindFramebuffer( GL_READ_FRAMEBUFFER, this->id );
+
+	//Do da blit
+	glBlitFramebuffer( sx0, sy0, sx1, sy1, dx0, dy0, dx1, dy1, mask, filter );
+
+	//Bind the old framebuffers back
+	glBindFramebuffer( GL_READ_FRAMEBUFFER, fbor );
 	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, fbod );
 }
 
