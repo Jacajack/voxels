@@ -12,6 +12,7 @@ SRC = \
 	src/core/texmodel.cpp \
 	src/core/light.cpp \
 	src/core/scene.cpp \
+	src/core/framebuffer.cpp \
 	src/core/window.cpp
 
 all:
