@@ -15,25 +15,9 @@
 //3D engine main namespace
 namespace lobor
 {
-	//Window data
-	extern struct WindowInformation
-	{
-		GLFWwindow *window;
-		int resx, resy;
-		std::string title;
-	} win;
-
-	//Status data
-	extern struct CoreStatus
-	{
-		bool active;
-	} status;
-
-	//Renderer and updater function
-	extern void update( );
-
 	//Init and destroy functions
-	extern int init( int resx, int resy, std::string title );
+	extern void init_glfw( );
+	extern void init_glew( );
 	extern void destroy( );
 
 	//Utils

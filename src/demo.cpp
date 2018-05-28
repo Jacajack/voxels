@@ -5,9 +5,13 @@
 int main( int argc, char **argv )
 {	
 	//Create window
-	if ( lobor::init( 1024, 768, "Lobor dev" ) ) return 1;
-	lobor::Window win( 1024, 768, "new window", lobor::win.window );
-	
+	lobor::init_glfw( );
+	lobor::Window win( 1024, 768, "Default view", NULL );
+	lobor::Window otherwin( 1024 /2, 768/2, "UV map", static_cast<GLFWwindow*>(win) );
+	win.use( );
+	lobor::init_glew( );
+
+	std::cout << sizeof(float) << std::endl;
 	
 	GLuint vertex_array_ida;
 	glGenVertexArrays(1, &vertex_array_ida);
@@ -17,7 +21,7 @@ int main( int argc, char **argv )
 	glDepthFunc(GL_LESS);
 
 	std::cout << glfwGetCurrentContext( ) << std::endl;
-	win.use( );
+	otherwin.use( );
 	std::cout << glfwGetCurrentContext( ) << std::endl;
 	
 
@@ -41,6 +45,20 @@ int main( int argc, char **argv )
 		}
 	);
 
+	lobor::Shader othershader(
+		{
+			{"shaders/zval/vertex.glsl", GL_VERTEX_SHADER},
+			{"shaders/zval/fragment.glsl", GL_FRAGMENT_SHADER},
+		},
+		{
+			"mat_model",
+			"mat_view",
+			"mat_projection",
+			"model_tint",
+			"texture_sampler"
+		}
+	);
+
 	lobor::TexturedModel unicorn( "models/uni.obj", "models/uni.png" );
 
 	glm::mat4 mat_model( 1.0 );
@@ -53,7 +71,7 @@ int main( int argc, char **argv )
 		glm::radians( 90.0 ), //FoV
 		(double) 1024.0 / 768.0, //Aspect ratio
 		0.1, //Near clipping plane
-		100.0 //Far clipping plane
+		20.0 //Far clipping plane
 	);
 	glm::vec4 model_tint( 1, 0, 1, 1 );
 	
@@ -63,6 +81,12 @@ int main( int argc, char **argv )
 	glUniformMatrix4fv( shader.uniform( "mat_view" ), 1, GL_FALSE, &mat_view[0][0] );
 	glUniformMatrix4fv( shader.uniform( "mat_projection" ), 1, GL_FALSE, &mat_projection[0][0] );
 	glUniformMatrix4fv( shader.uniform( "mat_model" ), 1, GL_FALSE, &mat_model[0][0] );
+
+	othershader.use( );
+	glUniform4fv( othershader.uniform( "model_tint" ), 1, &model_tint[0] );
+	glUniformMatrix4fv( othershader.uniform( "mat_view" ), 1, GL_FALSE, &mat_view[0][0] );
+	glUniformMatrix4fv( othershader.uniform( "mat_projection" ), 1, GL_FALSE, &mat_projection[0][0] );
+	glUniformMatrix4fv( othershader.uniform( "mat_model" ), 1, GL_FALSE, &mat_model[0][0] );
 	//glUniform1i( shader.uniform( "texture_sampler" ), 0 );
 
 
@@ -79,21 +103,23 @@ int main( int argc, char **argv )
 	{
 		win.use( );
 		shader.use( );
-		glClearColor( 0.2, 0.2, 0.0, 0.0 );
+		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		unicorn.draw( shader );
 		win.swap_buffers( );
+		glfwPollEvents( );
 		
-		glfwMakeContextCurrent( lobor::win.window );
-		shader.use( );
-		glClearColor( 0.2, 0.2, 0.0, 0.0 );
+		otherwin.use( );
+		othershader.use( );
+		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		unicorn.draw( shader );
-		lobor::update( );
+		otherwin.swap_buffers( );
+		glfwPollEvents( );
 
-		
+				
 	}
-	while ( lobor::status.active == true );
+	while ( !win.should_close( ) && !otherwin.should_close( ) );
 	
 	//Destroy
 	lobor::destroy( );

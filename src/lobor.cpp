@@ -8,10 +8,6 @@
 //Lobor includes
 #include "core/shader.hpp"
 
-//Lobor structs
-struct lobor::WindowInformation lobor::win;
-struct lobor::CoreStatus lobor::status;
-
 //Logger function
 void __attribute__( ( format ( printf, 2, 3 ) ) ) lobor::log( int level, const char *format, ... )
 {
@@ -57,27 +53,14 @@ void __attribute__( ( format ( printf, 1, 2 ) ) ) lobor::log( const char *format
 	va_end( ap );
 }
 
-//The renderer
-void lobor::update( )
-{
-	if ( lobor::status.active == false ) return;
-
-
-	//Update buffers and poll events
-	glfwSwapBuffers( lobor::win.window );
-	glfwPollEvents( );
-	lobor::status.active = !glfwWindowShouldClose( lobor::win.window );
-}
-
-//3D engine init routine
-int lobor::init( int resx, int resy, std::string title )
+//GLFW init
+void lobor::init_glfw( )
 {
 	//GLFW init
 	if ( !glfwInit( ) )
 	{
 		lobor::log( LOBOR_ERROR, "GLFW init failed" );
-		//std::cerr << "ifirt: GLFW init failed\n";
-		return 1;
+		throw "GLFW init failed";
 	}
 
 	//Window params
@@ -87,36 +70,19 @@ int lobor::init( int resx, int resy, std::string title )
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
 	glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+}
 
-	//Create the window
-	lobor::win.resx = resx;
-	lobor::win.resy = resy;
-	lobor::win.title = title;
-	lobor::win.window = glfwCreateWindow( lobor::win.resx, lobor::win.resy, lobor::win.title.c_str( ), NULL, NULL );
-	if ( lobor::win.window == NULL )
-	{
-		std::cerr << "lobor: Window creation failed\n";
-		glfwTerminate( );
-		return 1;
-	}
-	glfwMakeContextCurrent( lobor::win.window );
-
+//GLEW init
+void lobor::init_glew( )
+{
 	//GLEW init
 	glewExperimental = true;
 	if ( glewInit( ) != GLEW_OK )
 	{
-		std::cerr << "lobor: GLEW init failed!\n";
+		lobor::log( LOBOR_ERROR, "lobor: GLEW init failed! Are you using any window?" );
 		glfwTerminate( );
-		return 1;
+		throw "GLEW init failed";
 	}
-
-	//Input modes
-	glfwSetInputMode( lobor::win.window, GLFW_STICKY_KEYS, GL_TRUE );
-
-	//Consider Lobor running
-	lobor::status.active = true;
-
-	return 0;
 };
 
 //Cleanup function
