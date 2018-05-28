@@ -7,7 +7,7 @@ int main( int argc, char **argv )
 	//Create window
 	lobor::init_glfw( );
 	lobor::Window win( 1024, 768, "Default view", NULL );
-	lobor::Window otherwin( 1024 /2, 768/2, "UV map", static_cast<GLFWwindow*>(win) );
+	lobor::Window otherwin( 1024 /2, 768/2, "UV map", win );
 	win.use( );
 	lobor::init_glew( );
 
@@ -107,16 +107,18 @@ int main( int argc, char **argv )
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		unicorn.draw( shader );
 		win.swap_buffers( );
-		glfwPollEvents( );
 		
 		otherwin.use( );
 		othershader.use( );
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		unicorn.draw( shader );
+		
+		glBlitFramebuffer( 0, 0, 1024/4, 768/4, 1024/4, 768/4, 1024/2, 768/2, GL_COLOR_BUFFER_BIT, GL_NEAREST );
 		otherwin.swap_buffers( );
+		
+		
 		glfwPollEvents( );
-
 				
 	}
 	while ( !win.should_close( ) && !otherwin.should_close( ) );

@@ -8,6 +8,13 @@ GLFWwindow *lobor::Window::get_window( )
 	return this->window;
 }
 
+//Implicit conversion to GLFWwindow* - equivalent of get_window
+lobor::Window::operator GLFWwindow*( )
+{
+	return this->window;
+}
+
+
 //Checks whether the window should close
 bool lobor::Window::should_close( )
 {

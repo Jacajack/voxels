@@ -20,7 +20,8 @@ namespace lobor
 			Window( int width, int height, std::string title, GLFWwindow *share );
 			~Window( );
 
-			explicit operator GLFWwindow*( ) { return this->window; }
+			//Implicit conversion to GLFWwindow* - have fun debugging!
+			operator GLFWwindow*( );
 
 			GLFWwindow *get_window( ); //Returns pointer to the GLFWwindow
 			bool should_close( ); //Checks if window should close
