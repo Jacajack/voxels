@@ -26,6 +26,9 @@ namespace lobor
 
 		protected:
 		public:
+			//Implicit GLuint conversion
+			operator GLuint( );
+
 			//Getter functions
 			GLuint get_id( );
 			int get_width( );

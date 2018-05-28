@@ -4,7 +4,6 @@
 #include <libpng16/png.h>
 #include "../lobor.hpp"
 
-
 //Simple, default allocation constructor
 void lobor::Texture::generate_texture( int width, int height, GLenum type, GLenum format, GLenum iformat, const void *data = NULL )
 {
@@ -160,6 +159,12 @@ void lobor::Texture::load_image_data( std::string filename )
 	std::fclose( texfile );
 
 	lobor::log( LOBOR_LOG, "loaded %dx%d texture from file `%s'", width, height, filename.c_str( ) );
+}
+
+//Implicit GLuint conversion
+lobor::Texture::operator GLuint( )
+{
+	return this->id;
 }
 
 //Getters
