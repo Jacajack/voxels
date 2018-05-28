@@ -5,8 +5,7 @@
 in vec2 v_uv_o;
 
 uniform sampler2D texture_sampler;
-
-out vec3 color;
+layout(location = 0) out vec3 color;
 
 
 void main()
