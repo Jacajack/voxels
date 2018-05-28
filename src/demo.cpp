@@ -13,6 +13,7 @@ int main( int argc, char **argv )
 
 	std::cout << sizeof(float) << std::endl;
 	
+	//Win
 	GLuint vertex_array_ida;
 	glGenVertexArrays(1, &vertex_array_ida);
 	glBindVertexArray(vertex_array_ida);
@@ -20,15 +21,16 @@ int main( int argc, char **argv )
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	std::cout << glfwGetCurrentContext( ) << std::endl;
-	otherwin.use( );
-	std::cout << glfwGetCurrentContext( ) << std::endl;
-	
 
+	//Otherwin
+	otherwin.use( );
 	//Create vertex array
 	GLuint vertex_array_id;
 	glGenVertexArrays(1, &vertex_array_id);
 	glBindVertexArray(vertex_array_id);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 
 	lobor::Shader shader(
@@ -90,36 +92,59 @@ int main( int argc, char **argv )
 	//glUniform1i( shader.uniform( "texture_sampler" ), 0 );
 
 
+	win.use( );
+	GLint dims[4] = {0};
+	glGetIntegerv(GL_VIEWPORT, dims);
+	GLint fbWidth = dims[2];
+	GLint fbHeight = dims[3];
+	std::cout << fbWidth << "\t" << fbHeight << std::endl;
 
+	//lobor::Framebuffer fb( 1024, 768, 2 );
+	//fb.use(  );
+	//glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-	//Enable Z-buffer
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	
-
+	//Some serious manly C code here
+	GLuint fb;
+	glGenFramebuffers( 1, &fb );
 
 	//Game loop
 	do
 	{
+		//fb.use( );
 		win.use( );
+		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		shader.use( );
+
+		//Default FB gets cleared
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+		
+		//Unicorn lands in my FB
+		glBindFramebuffer( GL_FRAMEBUFFER, fb );
 		unicorn.draw( shader );
+		
+		//We now copy the unicorn back to default FB
+		glBindFramebuffer( GL_READ_FRAMEBUFFER, fb );
+		glBlitFramebuffer( 0, 0, 1024, 768, 0, 0, 1024, 768, GL_COLOR_BUFFER_BIT, GL_NEAREST );
+
+		//fb.blit_to( 0, 0, 0, 1024, 768, 0, 0, 1024, 768, GL_COLOR_BUFFER_BIT, GL_NEAREST );
+		
 		win.swap_buffers( );
 		
+		//fb.use( );
+		//glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		otherwin.use( );
 		othershader.use( );
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		unicorn.draw( shader );
 		
-		glBlitFramebuffer( 0, 0, 1024/4, 768/4, 1024/4, 768/4, 1024/2, 768/2, GL_COLOR_BUFFER_BIT, GL_NEAREST );
+		//glBlitFramebuffer( 0, 0, 1024/4, 768/4, 1024/4, 768/4, 1024/2, 768/2, GL_COLOR_BUFFER_BIT, GL_NEAREST );
 		otherwin.swap_buffers( );
 		
 		
 		glfwPollEvents( );
-				
+		//std::cout << "a\n";
 	}
 	while ( !win.should_close( ) && !otherwin.should_close( ) );
 	

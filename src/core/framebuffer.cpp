@@ -9,7 +9,7 @@ lobor::Framebuffer::operator GLuint( )
 }
 
 //Use framebuffer for reading/writing
-void lobor::Framebuffer::use( bool read = true, bool draw = true )
+void lobor::Framebuffer::use( bool read, bool draw )
 {
 	if ( read && draw )
 		glBindFramebuffer( GL_FRAMEBUFFER, this->id );
@@ -24,7 +24,7 @@ void lobor::Framebuffer::use( bool read = true, bool draw = true )
 
 //Copy data to this framebuffer
 void lobor::Framebuffer::blit( GLuint source, int sx0, int sy0, int sx1, int sy1, int dx0, int dy0, int dx1, int dy1, 
-	GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST )
+	GLbitfield mask, GLenum filter )
 {
 	//Save current framebuffers
 	GLint fbod = 0, fbor = 0;
@@ -47,7 +47,7 @@ void lobor::Framebuffer::blit( GLuint source, int sx0, int sy0, int sx1, int sy1
 
 //Copy data from this framebuffer
 void lobor::Framebuffer::blit_to( GLuint dest, int sx0, int sy0, int sx1, int sy1, int dx0, int dy0, int dx1, int dy1, 
-	GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST )
+	GLbitfield mask, GLenum filter )
 {
 	//Save current framebuffers
 	GLint fbod = 0, fbor = 0;
@@ -97,6 +97,12 @@ lobor::Framebuffer::Framebuffer( int width, int height, int texture_count )
 		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, tex, 0 );
 		this->textures.push_back( tex );
 	}
+
+	lobor::Texture dtex( width, height, GL_FLOAT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, dtex, 0 );
+	this->textures.push_back( dtex );
+
+	lobor::log( LOBOR_INFO, "generated %dx%d framebuffer consisting of %ld textures", width, height, this->textures.size( ) );
 }
 
 //Destructor

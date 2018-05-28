@@ -10,6 +10,7 @@
 #include "core/texture.hpp"
 #include "core/texmodel.hpp"
 #include "core/scene.hpp"
+#include "core/framebuffer.hpp"
 #include "core/window.hpp"
 
 //3D engine main namespace
