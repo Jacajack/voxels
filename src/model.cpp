@@ -1,9 +1,9 @@
-#include "model.hpp"
+#include <lobor/model.hpp>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <string.h>
-#include "../lobor.hpp"
+#include <lobor/lobor.hpp>
 
 //Very simple OBJ file loader
 void lobor::Model::load_obj_file( std::string filename )

@@ -3,7 +3,7 @@
 
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../lobor.hpp"
+#include "lobor.hpp"
 
 namespace lobor
 {

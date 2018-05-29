@@ -5,13 +5,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "core/shader.hpp"
-#include "core/model.hpp"
-#include "core/texture.hpp"
-#include "core/texmodel.hpp"
-#include "core/scene.hpp"
-#include "core/framebuffer.hpp"
-#include "core/window.hpp"
+#include "shader.hpp"
+#include "model.hpp"
+#include "texture.hpp"
+#include "texmodel.hpp"
+#include "scene.hpp"
+#include "framebuffer.hpp"
+#include "window.hpp"
 
 //3D engine main namespace
 namespace lobor

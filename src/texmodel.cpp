@@ -1,7 +1,7 @@
-#include "texmodel.hpp"
+#include <lobor/texmodel.hpp>
 #include <string>
 #include <GL/glew.h>
-#include "../lobor.hpp"
+#include <lobor/lobor.hpp>
 
 /*
 	This is the default draw method

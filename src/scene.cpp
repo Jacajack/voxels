@@ -1,5 +1,5 @@
-#include "scene.hpp"
-#include "../lobor.hpp"
+#include <lobor/scene.hpp>
+#include <lobor/lobor.hpp>
 
 //Add new object to the scene
 void lobor::Scene::add( lobor::Model *model )

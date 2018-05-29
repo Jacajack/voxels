@@ -1,6 +1,6 @@
-#include "framebuffer.hpp"
+#include <lobor/framebuffer.hpp>
 #include <GL/glew.h>
-#include "../lobor.hpp"
+#include <lobor/lobor.hpp>
 
 //Just an implicit cast
 lobor::Framebuffer::operator GLuint( )

@@ -1,6 +1,6 @@
-#include "light.hpp"
+#include <lobor/light.hpp>
 #include <GL/glew.h>
-#include "../lobor.hpp"
+#include <lobor/lobor.hpp>
 
 
 //Simple light source constructor

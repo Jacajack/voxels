@@ -1,10 +1,10 @@
-#include "shader.hpp"
+#include <lobor/shader.hpp>
 #include <initializer_list>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "../lobor.hpp"
+#include <lobor/lobor.hpp>
 
 //Slurp file into std::string
 static int slurp_file( std::string &str, std::string filename )

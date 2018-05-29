@@ -1,6 +1,6 @@
-#include "window.hpp"
+#include <lobor/window.hpp>
 #include <string>
-#include "../lobor.hpp"
+#include <lobor/lobor.hpp>
 
 //Just returns the window pointer
 GLFWwindow *lobor::Window::get_window( )

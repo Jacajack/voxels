@@ -7,10 +7,10 @@ set (lobor_VERSION_MINOR 1)
 set( PROJECT_LINK_LIBS "GL" "glfw" "GLEW" "png16" )
 
 #I will have to create separate include dir later
-include_directories("src" "src/core")
+include_directories("include")
 
 #Sources
-file( GLOB SOURCES "src/core/*.cpp" "src/demo.cpp" "src/lobor.cpp" )
+file( GLOB SOURCES "src/*.cpp" "demo.cpp" )
 
 #Demo compilation and linking
 add_executable(demo ${SOURCES})

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <GL/glew.h>
-#include "../lobor.hpp"
+#include "lobor.hpp"
 
 namespace lobor
 {

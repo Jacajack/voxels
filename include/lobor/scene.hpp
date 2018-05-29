@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "model.hpp"
+#include "lobor.hpp"
 
 /*
 	Note: most of this needs recoding

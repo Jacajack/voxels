@@ -1,5 +1,5 @@
 #include <iostream>
-#include "lobor.hpp"
+#include <lobor/lobor.hpp>
 
 
 int main( int argc, char **argv )

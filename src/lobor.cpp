@@ -1,12 +1,10 @@
-#include "lobor.hpp"
+#include <lobor/lobor.hpp>
 #include <iostream>
 #include <string>
 #include <stdarg.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-//Lobor includes
-#include "core/shader.hpp"
 
 //Logger function
 void __attribute__( ( format ( printf, 2, 3 ) ) ) lobor::log( int level, const char *format, ... )

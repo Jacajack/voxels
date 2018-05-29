@@ -1,8 +1,8 @@
-#include "texture.hpp"
+#include <lobor/texture.hpp>
 #include <string>
 #include <GL/glew.h>
 #include <libpng16/png.h>
-#include "../lobor.hpp"
+#include <lobor/lobor.hpp>
 
 //Simple, default allocation constructor
 void lobor::Texture::generate_texture( int width, int height, GLenum type, GLenum format, GLenum iformat, const void *data = NULL )
