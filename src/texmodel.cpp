@@ -19,10 +19,6 @@ void lobor::TexturedModel::draw( lobor::Shader &shader )
 
 	//Call base class draw method
 	Model::draw( );
-
-	//Disable texure
-	glBindTexture( GL_TEXTURE_2D, 0 );
-	glDisable( GL_TEXTURE_2D );
 }
 
 //The default constructor
