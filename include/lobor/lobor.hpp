@@ -2,6 +2,7 @@
 #define LOBOR_HPP
 
 #include <string>
+#include <assert.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -24,6 +25,8 @@ namespace lobor
 	//Utils
 	extern const char *gl_error_str( GLenum error );
 	#define LOBOR_PEEK_GL_ERROR {lobor::log( LOBOR_DEBUG, __FILE__ ":%d: %s", __LINE__, lobor::gl_error_str( glGetError( ) ) ); }
+	#define LOBOR_CHECK_GL_ERROR {GLenum err = glGetError( ); if ( err != GL_NO_ERROR ) lobor::log( LOBOR_DEBUG, __FILE__ ":%d: %s", __LINE__, lobor::gl_error_str( err ) ); }
+	#define LOBOR_ASSERT_GL_ERROR {GLenum err = glGetError( ); if ( err != GL_NO_ERROR ) { lobor::log( LOBOR_DEBUG, __FILE__ ":%d: %s", __LINE__, lobor::gl_error_str( err ) ); assert( 0 && "GL error" ); } }
 
 	extern void __attribute__( ( format ( printf, 2, 3 ) ) ) log( int level, const char *format, ... );
 	extern void __attribute__( ( format ( printf, 1, 2 ) ) ) log( const char *format, ... );
