@@ -34,7 +34,7 @@ void lobor::Window::use( )
 }
 
 //Default constructor
-lobor::Window::Window( int width, int height, std::string title, GLFWwindow *share = NULL )
+lobor::Window::Window( int width, int height, std::string title, GLFWwindow *share )
 {
 	this->active = false;
 	this->width = width;
@@ -51,6 +51,13 @@ lobor::Window::Window( int width, int height, std::string title, GLFWwindow *sha
 	{
 		this->active = true;
 	}
+
+	//Info
+	if ( share == NULL )
+		lobor::log( LOBOR_INFO, "opening a new %dx%d window", width, height );
+	else
+		lobor::log( LOBOR_INFO, "opening a new %dx%d window sharing context with %p", width, height, share );
+	
 }
 
 //Default destructor
