@@ -5,6 +5,43 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+//Convert GL error enum to human readable messages
+const char *lobor::gl_error_str( GLenum error )
+{
+	switch ( error )
+	{
+		case GL_NO_ERROR:
+			return "GL_NO_ERROR";
+			break;
+
+		case GL_INVALID_ENUM:
+			return "GL_INVALID_ENUM";
+			break;
+
+		case GL_INVALID_VALUE:
+			return "GL_INVALID_VALUE";
+			break;
+
+		case GL_INVALID_OPERATION:
+			return "GL_INVALID_OPERATION";
+			break;
+
+		case GL_OUT_OF_MEMORY:
+			return "GL_OUT_OF_MEMORY";
+			break;
+
+		case GL_STACK_UNDERFLOW:
+			return "GL_STACK_UNDERFLOW";
+			break;
+
+		case GL_STACK_OVERFLOW:
+			return "GL_STACK_OVERFLOW";
+			break;
+
+		default:
+			return NULL;
+	}
+}
 
 //Logger function
 void __attribute__( ( format ( printf, 2, 3 ) ) ) lobor::log( int level, const char *format, ... )

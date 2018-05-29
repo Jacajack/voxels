@@ -22,6 +22,9 @@ namespace lobor
 	extern void destroy( );
 
 	//Utils
+	extern const char *gl_error_str( GLenum error );
+	#define LOBOR_PEEK_GL_ERROR {lobor::log( LOBOR_DEBUG, __FILE__ ":%d: %s", __LINE__, lobor::gl_error_str( glGetError( ) ) ); }
+
 	extern void __attribute__( ( format ( printf, 2, 3 ) ) ) log( int level, const char *format, ... );
 	extern void __attribute__( ( format ( printf, 1, 2 ) ) ) log( const char *format, ... );
 	#define LOBOR_NOTICE 0
