@@ -26,6 +26,7 @@ namespace lobor
 		public:
 			void update( );
 			Texturepeek( int width, int height, std::string title, GLuint texture, GLFWwindow *share );
+			~Texturepeek( );
 	};
 };
 
