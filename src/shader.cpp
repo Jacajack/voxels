@@ -101,9 +101,9 @@ lobor::Shader::Shader( std::initializer_list <struct ShaderSpec> specs, std::ini
 	//Get linking results
 	int loglength = 0;
 	GLint result = GL_FALSE;
-	glGetProgramiv( this->program_id, GL_COMPILE_STATUS, &result );
+	glGetProgramiv( this->program_id, GL_LINK_STATUS, &result );
 	glGetProgramiv( this->program_id, GL_INFO_LOG_LENGTH, &loglength );
-	
+
 	//Output compilation results
 	if ( loglength > 0 )
 	{
