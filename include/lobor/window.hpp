@@ -4,13 +4,12 @@
 #include <string>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "lobor.hpp"
 
 namespace lobor
 {
 	class Window
 	{
-		private:
+		protected:
 			//Basic window data
 			GLFWwindow *window, *context_parent;
 			int width, height;
@@ -18,7 +17,7 @@ namespace lobor
 			bool active;
 		
 		public:
-			Window( int width, int height, std::string title, GLFWwindow *share );
+			Window( int width, int height, std::string title, GLFWwindow *share = NULL );
 			~Window( );
 
 			//Implicit conversion to GLFWwindow* - have fun debugging!
