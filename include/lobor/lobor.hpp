@@ -13,6 +13,7 @@
 #include "scene.hpp"
 #include "framebuffer.hpp"
 #include "window.hpp"
+#include "texturepeek.hpp"
 
 //3D engine main namespace
 namespace lobor
