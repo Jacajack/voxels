@@ -7,7 +7,6 @@ int main( int argc, char **argv )
 	//Create window
 	lobor::init_glfw( );
 	lobor::Window win( 1024, 768, "Default view", NULL );
-	lobor::Window otherwin( 1024 /2, 768/2, "UV map", win );
 	win.use( );
 	lobor::init_glew( );
 
@@ -20,18 +19,8 @@ int main( int argc, char **argv )
 	
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-
-
-	//Otherwin
-	otherwin.use( );
-	//Create vertex array
-	GLuint vertex_array_id;
-	glGenVertexArrays(1, &vertex_array_id);
-	glBindVertexArray(vertex_array_id);
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
+	
+	LOBOR_CHECK_GL_ERROR;
 
 	lobor::Shader shader(
 		{
@@ -47,21 +36,12 @@ int main( int argc, char **argv )
 		}
 	);
 
-	lobor::Shader othershader(
-		{
-			{"shaders/zval/vertex.glsl", GL_VERTEX_SHADER},
-			{"shaders/zval/fragment.glsl", GL_FRAGMENT_SHADER},
-		},
-		{
-			"mat_model",
-			"mat_view",
-			"mat_projection",
-			"model_tint",
-			"texture_sampler"
-		}
-	);
+	LOBOR_CHECK_GL_ERROR;
+
 
 	lobor::TexturedModel unicorn( "models/uni.obj", "models/uni.png" );
+
+	LOBOR_CHECK_GL_ERROR;
 
 	glm::mat4 mat_model( 1.0 );
 	glm::mat4 mat_view = glm::lookAt(
@@ -84,13 +64,7 @@ int main( int argc, char **argv )
 	glUniformMatrix4fv( shader.uniform( "mat_projection" ), 1, GL_FALSE, &mat_projection[0][0] );
 	glUniformMatrix4fv( shader.uniform( "mat_model" ), 1, GL_FALSE, &mat_model[0][0] );
 
-	othershader.use( );
-	glUniform4fv( othershader.uniform( "model_tint" ), 1, &model_tint[0] );
-	glUniformMatrix4fv( othershader.uniform( "mat_view" ), 1, GL_FALSE, &mat_view[0][0] );
-	glUniformMatrix4fv( othershader.uniform( "mat_projection" ), 1, GL_FALSE, &mat_projection[0][0] );
-	glUniformMatrix4fv( othershader.uniform( "mat_model" ), 1, GL_FALSE, &mat_model[0][0] );
-	//glUniform1i( shader.uniform( "texture_sampler" ), 0 );
-
+	LOBOR_CHECK_GL_ERROR;
 
 	win.use( );
 	GLint dims[4] = {0};
@@ -99,29 +73,50 @@ int main( int argc, char **argv )
 	GLint fbHeight = dims[3];
 	std::cout << fbWidth << "\t" << fbHeight << std::endl;
 
-	//lobor::Framebuffer fb( 1024, 768, 2 );
-	//fb.use(  );
-	//glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
 	//Some serious manly C code here
+	win.use( );
 	GLuint fb;
 	glGenFramebuffers( 1, &fb );
+	LOBOR_CHECK_GL_ERROR;
 	glBindFramebuffer( GL_FRAMEBUFFER, fb );
+	LOBOR_CHECK_GL_ERROR;
 
-	GLuint t;
+	
+	GLuint t, u;
 	glGenTextures( 1, &t );
 	glBindTexture( GL_TEXTURE_2D, t );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 1024, 768, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, t, 0 );
-
+	glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, t, 0 );
 	
+	glGenTextures( 1, &u );
+	glBindTexture( GL_TEXTURE_2D, u );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 1024, 768, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, u, 0 );
+	LOBOR_CHECK_GL_ERROR;
+
 	GLuint rbo;
 	glGenRenderbuffers( 1, &rbo );
 	glBindRenderbuffer( GL_RENDERBUFFER, rbo );
 	glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1024, 768 );
 	glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo );
+	LOBOR_CHECK_GL_ERROR;
+	
+	const GLenum draw_buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glBindFramebuffer( GL_FRAMEBUFFER, fb );
+	LOBOR_CHECK_GL_ERROR;
+	glDrawBuffers( 2, draw_buffers );
+	LOBOR_CHECK_GL_ERROR;
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
+	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    	printf("There is a problem with the FBO\n");
+
+	lobor::Texturepeek peek( 1024/2, 768/2, "peek", u, win );
+
 	
 
 	//Game loop
@@ -130,6 +125,7 @@ int main( int argc, char **argv )
 		//fb.use( );
 		win.use( );
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+		LOBOR_CHECK_GL_ERROR;
 		shader.use( );
 
 		//Default FB gets cleared
@@ -138,6 +134,7 @@ int main( int argc, char **argv )
 		
 		//Unicorn lands in my FB
 		glBindFramebuffer( GL_FRAMEBUFFER, fb );
+		LOBOR_CHECK_GL_ERROR;
 		unicorn.draw( shader );
 		
 		//We now copy the unicorn back to default FB
@@ -147,24 +144,18 @@ int main( int argc, char **argv )
 
 		//fb.blit_to( 0, 0, 0, 1024, 768, 0, 0, 1024, 768, GL_COLOR_BUFFER_BIT, GL_NEAREST );
 		
+		//win.swap_buffers( );
+
+
+
+		
 		win.swap_buffers( );
-		/*
-		//fb.use( );
-		//glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-		otherwin.use( );
-		othershader.use( );
-		glClearColor( 0.1, 0.1, 0.1, 0.0 );
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-		unicorn.draw( shader );
-		
-		//glBlitFramebuffer( 0, 0, 1024/4, 768/4, 1024/4, 768/4, 1024/2, 768/2, GL_COLOR_BUFFER_BIT, GL_NEAREST );
-		otherwin.swap_buffers( );
-		*/
-		
+		peek.update( );
+		LOBOR_CHECK_GL_ERROR;
+
 		glfwPollEvents( );
-		//std::cout << "a\n";
 	}
-	while ( !win.should_close( ) && !otherwin.should_close( ) );
+	while ( !win.should_close( ) && !peek.should_close( ) );
 	
 	//Destroy
 	lobor::destroy( );

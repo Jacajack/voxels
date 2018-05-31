@@ -6,6 +6,7 @@ in vec2 v_uv_o;
 
 uniform sampler2D texture_sampler;
 layout(location = 0) out vec3 color;
+layout(location = 1) out vec3 color2;
 
 
 void main()
@@ -22,5 +23,6 @@ void main()
 	//color = vec3( 1, 1, 1 );//model_color;// * cosTheta;
 
 	color = texture(texture_sampler, v_uv_o).rgb;
+	color2 = vec3( v_uv_o.xy, 0 );
 
 }
