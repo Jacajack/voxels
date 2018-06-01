@@ -121,7 +121,7 @@ int main( int argc, char **argv )
 	LOBOR_CHECK_GL_ERROR;
 
 	
-	GLuint t, u;
+	GLuint t, u, v;
 	glGenTextures( 1, &t );
 	glBindTexture( GL_TEXTURE_2D, t );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 1024, 768, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
@@ -135,6 +135,13 @@ int main( int argc, char **argv )
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, u, 0 );
+
+	glGenTextures( 1, &v );
+	glBindTexture( GL_TEXTURE_2D, v );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 1024, 768, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, v, 0 );
 	LOBOR_CHECK_GL_ERROR;
 
 	GLuint rbo;
@@ -144,18 +151,18 @@ int main( int argc, char **argv )
 	glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo );
 	LOBOR_CHECK_GL_ERROR;
 	
-	const GLenum draw_buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	const GLenum draw_buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 	glBindFramebuffer( GL_FRAMEBUFFER, fb );
 	LOBOR_CHECK_GL_ERROR;
-	glDrawBuffers( 2, draw_buffers );
+	glDrawBuffers( 3, draw_buffers );
 	LOBOR_CHECK_GL_ERROR;
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
 	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     	printf("There is a problem with the FBO\n");
 
-	lobor::Texturepeek peek( 1024/2, 768/2, "peek", u, win );
-
+	lobor::Texturepeek peek( 1024/2, 768/2, "peek uv", u, win );
+	lobor::Texturepeek peek2( 1024/2, 768/2, "peek normal", v, win );
 	
 
 	//Game loop
@@ -195,6 +202,7 @@ int main( int argc, char **argv )
 		win.swap_buffers( );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		peek.update( );
+		peek2.update( );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		
 		LOBOR_CHECK_GL_ERROR;

@@ -3,10 +3,12 @@
 //Color from vertex shader
 //Output color
 in vec2 v_uv_o;
+in vec3 v_normal_o;
 
 uniform sampler2D texture_sampler;
 layout(location = 0) out vec3 color;
 layout(location = 1) out vec3 color2;
+layout(location = 2) out vec3 color3;
 
 
 void main()
@@ -24,5 +26,6 @@ void main()
 
 	color = texture(texture_sampler, v_uv_o).rgb;
 	color2 = vec3( v_uv_o.xy, 0 );
+	color3 = v_normal_o;;
 
 }

@@ -10,6 +10,7 @@ uniform mat4 mat_projection;
 
 //UV map output
 out vec2 v_uv_o;
+out vec3 v_normal_o;
 
 //Vertex position in world and cameraspace
 out vec3 v_pos_world;
@@ -32,6 +33,6 @@ void main( )
 
 	//Just pass on the color to the fragment shader
 	v_uv_o = v_uv;
-
+	v_normal_o = v_normal_model;
 	
 }
