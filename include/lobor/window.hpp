@@ -23,6 +23,9 @@ namespace lobor
 			//Implicit conversion to GLFWwindow* - have fun debugging!
 			operator GLFWwindow*( );
 
+			int get_width( );
+			int get_height( );
+
 			GLFWwindow *get_window( ); //Returns pointer to the GLFWwindow
 			bool should_close( ); //Checks if window should close
 			void swap_buffers( ); //Calls glfwSwapBuffers

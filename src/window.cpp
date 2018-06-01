@@ -14,6 +14,15 @@ lobor::Window::operator GLFWwindow*( )
 	return this->window;
 }
 
+int lobor::Window::get_width( )
+{
+	return this->width;
+}
+
+int lobor::Window::get_height( )
+{
+	return this->height;
+}
 
 //Checks whether the window should close
 bool lobor::Window::should_close( )
