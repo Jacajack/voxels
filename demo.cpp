@@ -2,6 +2,44 @@
 #include <lobor/lobor.hpp>
 
 
+void controls( lobor::Window &win, glm::mat4 &vmat )
+{
+	static glm::vec3 pos( 0 );
+
+	const double mspeed = 0.005;
+	const float speed = 3;
+
+	static double yaw = 0, pitch = 0;
+
+	static double lastt = glfwGetTime( );
+	double dt = glfwGetTime( ) - lastt;
+	lastt = glfwGetTime( );
+
+	glfwMakeContextCurrent( win );
+	
+	double cdx, cdy;
+	glfwGetCursorPos( win, &cdx, &cdy );
+	cdx -= win.get_width( ) / 2.0;
+	cdy -= win.get_height( ) / 2.0;
+	yaw += mspeed * cdx;
+	pitch += mspeed * cdy;
+
+	glm::vec3 dir(
+		cos( yaw ) * cos( pitch ),
+		sin( pitch ),
+		sin( yaw ) * cos( pitch )
+	);
+
+	if ( glfwGetKey( win, GLFW_KEY_W ) == GLFW_PRESS )
+		pos += float( speed * dt ) * dir;
+	if ( glfwGetKey( win, GLFW_KEY_S ) == GLFW_PRESS )
+		pos -= float( speed * dt ) * dir;
+
+	vmat = glm::lookAt( pos, pos + dir, glm::vec3( 0, 1, 0 ) );
+
+	glfwSetCursorPos( win, win.get_width( ) / 2.0, win.get_height( ) / 2.0 );
+}
+
 int main( int argc, char **argv )
 {	
 	//Create window
@@ -9,6 +47,7 @@ int main( int argc, char **argv )
 	lobor::Window win( 1024, 768, "Default view", NULL );
 	win.use( );
 	lobor::init_glew( );
+	glfwSetInputMode(win, GLFW_STICKY_KEYS, GL_TRUE);
 
 	std::cout << sizeof(float) << std::endl;
 	
@@ -134,6 +173,7 @@ int main( int argc, char **argv )
 		
 		//Unicorn lands in my FB
 		glBindFramebuffer( GL_FRAMEBUFFER, fb );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		LOBOR_CHECK_GL_ERROR;
 		unicorn.draw( shader );
 		
@@ -147,10 +187,16 @@ int main( int argc, char **argv )
 		//win.swap_buffers( );
 
 
-
+		controls( win, mat_view );
+		glUniformMatrix4fv( shader.uniform( "mat_view" ), 1, GL_FALSE, &mat_view[0][0] );
 		
+		
+
 		win.swap_buffers( );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		peek.update( );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+		
 		LOBOR_CHECK_GL_ERROR;
 
 		glfwPollEvents( );
