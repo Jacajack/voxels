@@ -30,10 +30,21 @@ void controls( lobor::Window &win, glm::mat4 &vmat )
 		sin( yaw ) * cos( pitch )
 	);
 
+	glm::vec3 right(
+		cos( yaw - M_PI_2 ) * ( cos( pitch ) > 0 ? 1 : -1 ),
+		0,
+		sin( yaw - M_PI_2 ) * ( cos( pitch ) > 0 ? 1 : -1 )
+	);
+
 	if ( glfwGetKey( win, GLFW_KEY_W ) == GLFW_PRESS )
 		pos += float( speed * dt ) * dir;
 	if ( glfwGetKey( win, GLFW_KEY_S ) == GLFW_PRESS )
 		pos -= float( speed * dt ) * dir;
+
+	if ( glfwGetKey( win, GLFW_KEY_A ) == GLFW_PRESS )
+		pos += float( speed * dt ) * right;
+	if ( glfwGetKey( win, GLFW_KEY_D ) == GLFW_PRESS )
+		pos -= float( speed * dt ) * right;
 
 	vmat = glm::lookAt( pos, pos + dir, glm::vec3( 0, 1, 0 ) );
 
@@ -47,7 +58,7 @@ int main( int argc, char **argv )
 	lobor::Window win( 1024, 768, "Default view", NULL );
 	win.use( );
 	lobor::init_glew( );
-	glfwSetInputMode(win, GLFW_STICKY_KEYS, GL_TRUE);
+	//glfwSetInputMode(win, GLFW_STICKY_KEYS, GL_TRUE);
 
 	std::cout << sizeof(float) << std::endl;
 	
